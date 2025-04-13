@@ -1,0 +1,35 @@
+# Set default behavior to auto
+* text=auto
+
+# Force line endings for source files
+*.cpp text eol=lf
+*.h   text eol=lf
+*.cs  text eol=lf
+*.ini text eol=lf
+*.usf text eol=lf
+*.ush text eol=lf
+*.uproject text eol=lf
+*.uplugin text eol=lf
+
+# Treat binary files as binary (no diffing)
+*.png binary
+*.jpg binary
+*.fbx binary
+*.uasset binary
+*.umap binary
+*.mp3 binary
+*.wav binary
+*.ogg binary
+*.ttf binary
+*.otf binary
+*.ico binary
+*.mp4 binary
+
+# Git LFS tracking (if using Git LFS)
+# Uncomment if you're using Git LFS and want to track UE assets
+# *.uasset filter=lfs diff=lfs merge=lfs -text
+# *.umap   filter=lfs diff=lfs merge=lfs -text
+
+# Keep Visual Studio settings out of diff
+*.sln merge=union
+*.vcxproj merge=union
