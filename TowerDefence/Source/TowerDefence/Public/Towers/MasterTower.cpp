@@ -17,11 +17,14 @@ AMasterTower::AMasterTower()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	AttributeSet = CreateDefaultSubobject<UTDAttributeSet>("AttributeSet");
 
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>("Box Component");
-	SetRootComponent(BoxComponent);
 	TowerBase = CreateDefaultSubobject<UStaticMeshComponent>("Tower Base");
+	SetRootComponent(TowerBase);
 	TowerHead = CreateDefaultSubobject<UStaticMeshComponent>("Tower Head");
+	TowerHead->SetupAttachment(TowerBase);
 	TowerBody = CreateDefaultSubobject<UStaticMeshComponent>("Tower Body");
+	TowerBody->SetupAttachment(TowerBase);
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>("Box Component");
+	BoxComponent->SetupAttachment(TowerBase);
 }
 
 UAbilitySystemComponent* AMasterTower::GetAbilitySystemComponent() const

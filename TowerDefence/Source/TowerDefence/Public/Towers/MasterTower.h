@@ -32,19 +32,20 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Base")
+	TObjectPtr<UStaticMeshComponent> TowerBase;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Body")
+	TObjectPtr<UStaticMeshComponent> TowerBody;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Head")
+	TObjectPtr<UStaticMeshComponent> TowerHead;
+	
 private:
-
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UAttributeSet> AttributeSet;
 
-	UPROPERTY(EditAnywhere, Category = "Tower Body")
-	TObjectPtr<UStaticMeshComponent> TowerBase;
-	UPROPERTY(EditAnywhere, Category = "Tower Body")
-	TObjectPtr<UStaticMeshComponent> TowerBody;
-	UPROPERTY(EditAnywhere, Category = "Tower Body")
-	TObjectPtr<UStaticMeshComponent> TowerHead;
 
 	UPROPERTY(EditAnywhere, Category = "Tower Hit Box")
 	TObjectPtr<UBoxComponent> BoxComponent;
