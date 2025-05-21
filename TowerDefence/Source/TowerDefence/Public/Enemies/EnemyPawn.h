@@ -3,22 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "BaseEnemy.generated.h"
+#include "GameFramework/Pawn.h"
+#include "EnemyPawn.generated.h"
 
-class UCharacterMovementComponent;
-class USphereComponent;
 class UAbilitySystemComponent;
 class UAttributeSet;
+class UCharacterMovementComponent;
+class USphereComponent;
 
 UCLASS()
-class TOWERDEFENCE_API ABaseEnemy : public AActor
+class TOWERDEFENCE_API AEnemyPawn : public APawn
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ABaseEnemy();
+
+public:
+	// Sets default values for this pawn's properties
+	AEnemyPawn();
 
 protected:
 	// Called when the game starts or when spawned
@@ -27,6 +27,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
 
