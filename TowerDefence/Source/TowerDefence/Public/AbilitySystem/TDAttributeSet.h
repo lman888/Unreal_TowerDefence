@@ -38,10 +38,6 @@ public:
 	FGameplayAttributeData AttackSpeed;
 	ATTRIBUTE_ACCESSORS(UTDAttributeSet, AttackSpeed);
 	
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MeleeArmour, Category = "Main Attributes")
-	FGameplayAttributeData MeleeArmour;
-	ATTRIBUTE_ACCESSORS(UTDAttributeSet, MeleeArmour);
-	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_RangedArmour, Category = "Main Attributes")
 	FGameplayAttributeData RangedArmour;
 	ATTRIBUTE_ACCESSORS(UTDAttributeSet, RangedArmour);
@@ -50,6 +46,10 @@ public:
 	FGameplayAttributeData MovementSpeed;
 	ATTRIBUTE_ACCESSORS(UTDAttributeSet, MovementSpeed);
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_AttackRange, Category = "Main Attributes")
+	FGameplayAttributeData AttackRange;
+	ATTRIBUTE_ACCESSORS(UTDAttributeSet, AttackRange);
+
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& oldHealth) const;
 	UFUNCTION()
@@ -57,9 +57,9 @@ public:
 	UFUNCTION()
 	void OnRep_AttackSpeed(const FGameplayAttributeData& oldAttackSpeed) const;
 	UFUNCTION()
-	void OnRep_MeleeArmour(const FGameplayAttributeData& oldMeleeArmour) const;
-	UFUNCTION()
 	void OnRep_RangedArmour(const FGameplayAttributeData& oldRangedArmour) const;
 	UFUNCTION()
 	void OnRep_MovementSpeed(const FGameplayAttributeData& oldMovementSpeed) const;
+	UFUNCTION()
+	void OnRep_AttackRange(const FGameplayAttributeData& oldAttackRange) const;
 };

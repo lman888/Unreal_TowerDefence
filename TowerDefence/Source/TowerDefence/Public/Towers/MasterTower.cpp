@@ -25,6 +25,12 @@ AMasterTower::AMasterTower()
 	TowerBody->SetupAttachment(TowerBase);
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>("Box Component");
 	BoxComponent->SetupAttachment(TowerBase);
+
+    if (AttributeSet == nullptr)
+    {
+	    UE_LOG(LogTemp, Warning, TEXT("Attribute Set Null for Tower"));
+    	return;
+    }
 }
 
 UAbilitySystemComponent* AMasterTower::GetAbilitySystemComponent() const
@@ -41,7 +47,6 @@ UAttributeSet* AMasterTower::GetAttributeSet() const
 void AMasterTower::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -49,4 +54,16 @@ void AMasterTower::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AMasterTower::InitializeAttributes() const
+{
+	if (TowerAttributes == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Please assign an Attribute Set to Tower Attributes!"));
+		return;
+	}
+
+	const FGameplayEffectSpecHandle TowerAttribute = AbilitySystemComponent->MakeOutgoingSpec(TowerAttributes, 1, AbilitySystemComponent->MakeEffectContext());
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*TowerAttribute.Data.Get());
 }

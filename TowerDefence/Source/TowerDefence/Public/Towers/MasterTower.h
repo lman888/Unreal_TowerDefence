@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "MasterTower.generated.h"
 
+class UGameplayEffect;
 class UBoxComponent;
 class UAbilitySystemComponent;
 class UAttributeSet;
@@ -22,6 +23,7 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	UFUNCTION(BlueprintCallable)
 	UAttributeSet* GetAttributeSet() const;
 	
 protected:
@@ -32,7 +34,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:
+
+	UFUNCTION(BlueprintCallable)
+	void InitializeAttributes() const;
+	
 protected:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Base")
 	TObjectPtr<UStaticMeshComponent> TowerBase;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Body")
@@ -40,13 +48,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Head")
 	TObjectPtr<UStaticMeshComponent> TowerHead;
 	
-private:
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UAttributeSet> AttributeSet;
-
-
 	UPROPERTY(EditAnywhere, Category = "Tower Hit Box")
 	TObjectPtr<UBoxComponent> BoxComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> TowerAttributes;
 };
