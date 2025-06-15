@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "MasterTower.generated.h"
 
+class UGameplayAbility;
+class UTDAbilitySystemComponent;
 class UGameplayEffect;
 class UBoxComponent;
 class UAbilitySystemComponent;
@@ -34,10 +36,19 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	void Targeting();
+
+	UFUNCTION(BlueprintPure)
+	AActor* GetTargetedEnemy();
+
 private:
 
+	//This is getting called in BeginPlay. I am not sure why it says "No blueprint usages".
 	UFUNCTION(BlueprintCallable)
 	void InitializeAttributes() const;
+
+	void AddTowerAbility(TSubclassOf<UGameplayAbility>& Ability) const;
 	
 protected:
 	
@@ -47,15 +58,26 @@ protected:
 	TObjectPtr<UStaticMeshComponent> TowerBody;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Head")
 	TObjectPtr<UStaticMeshComponent> TowerHead;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Targeting")
+	float ClosestDistance;
 	
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UTDAbilitySystemComponent> AbilitySystemComponent;
 	
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UAttributeSet> AttributeSet;
 	UPROPERTY(EditAnywhere, Category = "Tower Hit Box")
 	TObjectPtr<UBoxComponent> BoxComponent;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Targeting")
+	TArray<AActor*> EnemiesInRadius;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Targeting")
+	TObjectPtr<AActor> TargetedEnemy;
+	
 	UPROPERTY(EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> TowerAttributes;
+
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TSubclassOf<UGameplayAbility> TowerAbilities;
 };

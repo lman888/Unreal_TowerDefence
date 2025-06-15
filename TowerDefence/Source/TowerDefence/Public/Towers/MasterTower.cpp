@@ -31,6 +31,13 @@ AMasterTower::AMasterTower()
 	    UE_LOG(LogTemp, Warning, TEXT("Attribute Set Null for Tower"));
     	return;
     }
+
+    if (!HasAuthority())
+    {
+    	return;
+    }
+
+	TargetedEnemy = nullptr;
 }
 
 UAbilitySystemComponent* AMasterTower::GetAbilitySystemComponent() const
@@ -47,6 +54,8 @@ UAttributeSet* AMasterTower::GetAttributeSet() const
 void AMasterTower::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AddTowerAbility(TowerAbilities);
 }
 
 // Called every frame
@@ -54,6 +63,28 @@ void AMasterTower::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AMasterTower::Targeting()
+{
+	//Loop through all enemies inside the attack radius
+	for (AActor* Enemy : EnemiesInRadius)
+	{
+		FVector enemyLocation = Enemy->GetActorLocation();
+		FVector turretLocation = GetActorLocation();
+
+		UE::Math::TVector<double> vectorLength = enemyLocation - turretLocation;
+
+		if (ClosestDistance <= vectorLength.Length())
+		{
+			TargetedEnemy = Enemy;
+		}
+	}
+}
+
+AActor* AMasterTower::GetTargetedEnemy()
+{
+	return TargetedEnemy;
 }
 
 void AMasterTower::InitializeAttributes() const
@@ -66,4 +97,14 @@ void AMasterTower::InitializeAttributes() const
 
 	const FGameplayEffectSpecHandle TowerAttribute = AbilitySystemComponent->MakeOutgoingSpec(TowerAttributes, 1, AbilitySystemComponent->MakeEffectContext());
 	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*TowerAttribute.Data.Get());
+}
+
+void AMasterTower::AddTowerAbility(TSubclassOf<UGameplayAbility>& Ability) const
+{
+	if (Ability == nullptr)
+	{
+		return;
+	}
+	
+	AbilitySystemComponent->AddCharacterAbility(Ability);
 }

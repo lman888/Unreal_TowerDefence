@@ -13,5 +13,8 @@ UCLASS()
 class TOWERDEFENCE_API UTDAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
+
+public:
+	void AddCharacterAbility(TSubclassOf<UGameplayAbility>& Ability);
 	
 };
