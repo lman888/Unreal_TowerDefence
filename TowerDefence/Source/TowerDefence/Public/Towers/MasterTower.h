@@ -73,6 +73,7 @@ protected:
 	TArray<AActor*> EnemiesInRadius;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Targeting")
+	
 	TObjectPtr<AActor> TargetedEnemy;
 	
 	UPROPERTY(EditAnywhere, Category = "Attributes")

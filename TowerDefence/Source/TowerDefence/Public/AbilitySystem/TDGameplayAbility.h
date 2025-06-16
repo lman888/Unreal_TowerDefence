@@ -13,5 +13,18 @@ UCLASS()
 class TOWERDEFENCE_API UTDGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
+
+public:
+	UTDGameplayAbility();
+
+	UFUNCTION(BlueprintCallable)
+	void SetTarget(AActor* Target);
+
+	UFUNCTION(BlueprintPure)
+	AActor* GetTarget();
 	
+private:
+
+	UPROPERTY(EditAnywhere, Category = "Mesh")
+	TObjectPtr<AActor> ProjectileTarget;
 };
