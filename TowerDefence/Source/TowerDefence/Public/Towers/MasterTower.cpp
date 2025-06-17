@@ -25,10 +25,12 @@ AMasterTower::AMasterTower()
 	TowerBody->SetupAttachment(TowerBase);
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>("Box Component");
 	BoxComponent->SetupAttachment(TowerBase);
+	ProjectileTransform = CreateDefaultSubobject<UStaticMeshComponent>("Projectile Spawn");
+	ProjectileTransform->SetupAttachment(TowerHead);
 
     if (AttributeSet == nullptr)
     {
-	    UE_LOG(LogTemp, Warning, TEXT("Attribute Set Null for Tower"));
+	    UE_LOG(LogTemp, Warning, TEXT("Attribute Set Null for %s"), *GetName());
     	return;
     }
 
@@ -85,6 +87,11 @@ void AMasterTower::Targeting()
 AActor* AMasterTower::GetTargetedEnemy()
 {
 	return TargetedEnemy;
+}
+
+FTransform AMasterTower::GetProjectileSpawnLocation()
+{
+	return ProjectileTransform->GetComponentTransform();
 }
 
 void AMasterTower::InitializeAttributes() const

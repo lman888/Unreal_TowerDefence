@@ -3,9 +3,43 @@
 
 #include "AbilitySystem/TDGameplayAbility.h"
 
+#include "Interaction/TowerInterface.h"
+#include "Projectiles/ProjectileActor.h"
+
 UTDGameplayAbility::UTDGameplayAbility()
 {
-	ProjectileBody = CreateDefaultSubobject<UStaticMeshComponent>("Projectile Body");
+
+}
+
+void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	
+	if (!HasAuthority(&ActivationInfo))
+	{
+		return;
+	}
+
+	ITowerInterface* towerInterface = Cast<ITowerInterface>(GetAvatarActorFromActorInfo());
+	if (towerInterface)
+	{
+		FTransform SpawnTransform = towerInterface->GetProjectileSpawnLocation();
+		
+		AProjectileActor* Projectile = GetWorld()->SpawnActorDeferred<AProjectileActor>(ProjectileClass, SpawnTransform, GetOwningActorFromActorInfo(),
+											     Cast<APawn>(GetOwningActorFromActorInfo()), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+		if (Projectile == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Projectile is Invalid inside %s"), *GetName());
+			return;
+		}
+		
+		//Give Projectile a Gameplay Effect Spec for causing Damage
+		
+		Projectile->FinishSpawning(SpawnTransform);
+	}
 }
 
 void UTDGameplayAbility::SetTarget(AActor* Target)

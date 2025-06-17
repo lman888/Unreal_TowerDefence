@@ -6,6 +6,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "TDGameplayAbility.generated.h"
 
+class AProjectileActor;
 /**
  * 
  */
@@ -17,14 +18,21 @@ class TOWERDEFENCE_API UTDGameplayAbility : public UGameplayAbility
 public:
 	UTDGameplayAbility();
 
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+
 	UFUNCTION(BlueprintCallable)
 	void SetTarget(AActor* Target);
 
 	UFUNCTION(BlueprintPure)
 	AActor* GetTarget();
+
+protected:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<AProjectileActor> ProjectileClass;
 	
 private:
 
-	UPROPERTY(EditAnywhere, Category = "Mesh")
+	UPROPERTY(EditAnywhere, Category = "Target")
 	TObjectPtr<AActor> ProjectileTarget;
 };

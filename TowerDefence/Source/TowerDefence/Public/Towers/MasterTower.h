@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Actor.h"
+#include "Interaction/TowerInterface.h"
 #include "MasterTower.generated.h"
 
 class UGameplayAbility;
@@ -15,7 +16,7 @@ class UAbilitySystemComponent;
 class UAttributeSet;
 
 UCLASS()
-class TOWERDEFENCE_API AMasterTower : public AActor, public IAbilitySystemInterface
+class TOWERDEFENCE_API AMasterTower : public AActor, public IAbilitySystemInterface, public ITowerInterface
 {
 	GENERATED_BODY()
 	
@@ -42,6 +43,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	AActor* GetTargetedEnemy();
 
+protected:
+	virtual FTransform GetProjectileSpawnLocation() override;
+
 private:
 
 	//This is getting called in BeginPlay. I am not sure why it says "No blueprint usages".
@@ -52,12 +56,14 @@ private:
 	
 protected:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Base")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Mesh")
 	TObjectPtr<UStaticMeshComponent> TowerBase;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Body")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Mesh")
 	TObjectPtr<UStaticMeshComponent> TowerBody;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Head")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Mesh")
 	TObjectPtr<UStaticMeshComponent> TowerHead;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Mesh")
+	TObjectPtr<UStaticMeshComponent> ProjectileTransform;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Targeting")
 	float ClosestDistance;
 	
@@ -73,7 +79,6 @@ protected:
 	TArray<AActor*> EnemiesInRadius;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Targeting")
-	
 	TObjectPtr<AActor> TargetedEnemy;
 	
 	UPROPERTY(EditAnywhere, Category = "Attributes")
