@@ -26,6 +26,12 @@ void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	if (towerInterface)
 	{
 		FTransform SpawnTransform = towerInterface->GetProjectileSpawnLocation();
+
+		FRotator newRotation = SpawnTransform.Rotator();
+
+		newRotation.Yaw += 90.0f;
+
+		SpawnTransform.SetRotation(newRotation.Quaternion());
 		
 		AProjectileActor* Projectile = GetWorld()->SpawnActorDeferred<AProjectileActor>(ProjectileClass, SpawnTransform, GetOwningActorFromActorInfo(),
 											     Cast<APawn>(GetOwningActorFromActorInfo()), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
