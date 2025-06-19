@@ -16,6 +16,8 @@ void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	CommitAbility(Handle, ActorInfo, ActivationInfo);
 	
 	if (!HasAuthority(&ActivationInfo))
 	{
