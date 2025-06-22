@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/TDAbilitySystemComponent.h"
 #include "AbilitySystem/TDAttributeSet.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -22,7 +23,10 @@ AEnemyCharacter::AEnemyCharacter()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	InitializeAttributes();
+
+	GetCharacterMovement()->MaxWalkSpeed =  AttributeSet->GetMovementSpeed();
 }
 
 // Called every frame
@@ -39,3 +43,22 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 }
 
+UTDAbilitySystemComponent* AEnemyCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+void AEnemyCharacter::InitializeAttributes() const
+{
+	check(IsValid(GetAbilitySystemComponent()));
+	check(DefaultAttributes);
+	
+	const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	const FGameplayEffectSpecHandle EffectSpec = GetAbilitySystemComponent()->MakeOutgoingSpec(DefaultAttributes, 1, ContextHandle);
+	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpec.Data.Get(), GetAbilitySystemComponent());
+}
+
+UTDAttributeSet* AEnemyCharacter::GetAttributeSet() const
+{
+	return AttributeSet;
+}

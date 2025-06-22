@@ -6,9 +6,10 @@
 #include "GameFramework/Character.h"
 #include "EnemyCharacter.generated.h"
 
+class UGameplayEffect;
+class UTDAbilitySystemComponent;
+class UTDAttributeSet;
 class USphereComponent;
-class UAbilitySystemComponent;
-class UAttributeSet;
 
 UCLASS()
 class TOWERDEFENCE_API AEnemyCharacter : public ACharacter
@@ -30,10 +31,23 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintPure)
+	UTDAbilitySystemComponent* GetAbilitySystemComponent() const;
+
+	void InitializeAttributes() const;
+
+	UFUNCTION(BlueprintPure)
+	UTDAttributeSet* GetAttributeSet() const;
+
+protected:
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> DefaultAttributes;
+
 private:
+	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
+	TObjectPtr<UTDAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
-	TObjectPtr<UAttributeSet> AttributeSet;
+	TObjectPtr<UTDAttributeSet> AttributeSet;
 };

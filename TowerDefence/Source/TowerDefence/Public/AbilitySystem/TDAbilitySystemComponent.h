@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "TDAbilitySystemComponent.generated.h"
 
+class UTDAttributeSet;
 /**
  * 
  */
@@ -16,5 +17,4 @@ class TOWERDEFENCE_API UTDAbilitySystemComponent : public UAbilitySystemComponen
 
 public:
 	void AddCharacterAbility(TSubclassOf<UGameplayAbility>& Ability);
-	
 };
