@@ -56,7 +56,7 @@ UAttributeSet* AMasterTower::GetAttributeSet() const
 void AMasterTower::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	AddTowerAbility(TowerAbilities);
 }
 

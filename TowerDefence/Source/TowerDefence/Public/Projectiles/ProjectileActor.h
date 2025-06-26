@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayEffectTypes.h"
 #include "ProjectileActor.generated.h"
 
+struct FGameplayEffectSpecHandle;
 class UProjectileMovementComponent;
 class USphereComponent;
 class UNiagaraSystem;
@@ -22,7 +24,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
+	void ApplyDamage() const;
+	
 	UFUNCTION()
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -32,7 +36,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Collision")
 	TObjectPtr<USphereComponent> SphereCollision;
-
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
@@ -40,4 +43,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+
+	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true), Category = "Effects")
+	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 };

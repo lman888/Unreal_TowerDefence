@@ -26,10 +26,16 @@ public:
 	UFUNCTION(BlueprintPure)
 	AActor* GetTarget();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	FScalableFloat Damage;
+
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AProjectileActor> ProjectileClass;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly);
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
 	
 private:
 

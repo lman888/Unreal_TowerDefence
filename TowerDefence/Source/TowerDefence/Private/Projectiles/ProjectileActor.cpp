@@ -3,12 +3,14 @@
 
 #include "Projectiles/ProjectileActor.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "Components/SphereComponent.h"
 #include "Enemies/EnemyCharacter.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Towers/MasterTower.h"
-#include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "AbilitySystem/TDAbilitySystemComponent.h"
+#include "GameplayEffects/TDGameplayEffects.h"
 
 // Sets default values
 AProjectileActor::AProjectileActor()
@@ -41,7 +43,6 @@ void AProjectileActor::BeginPlay()
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AProjectileActor::OnSphereOverlap);
 
 	AMasterTower* projectileOwner = Cast<AMasterTower>(GetOwner());
-
 	if (projectileOwner == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Owner is invalid in %s"), *GetName());
@@ -51,20 +52,55 @@ void AProjectileActor::BeginPlay()
 	ProjectileMovement->HomingTargetComponent = projectileOwner->GetTargetedEnemy()->GetRootComponent();
 }
 
+void AProjectileActor::ApplyDamage() const
+{
+	AMasterTower* projectileOwner = Cast<AMasterTower>(GetOwner());
+	if (projectileOwner == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Owner is invalid in %s"), *GetName());
+		return;
+	}
+
+	AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(projectileOwner->GetTargetedEnemy());
+	if (Enemy == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Enemy is invalid in %s"), *GetName());
+		return;
+	}
+}
+
 void AProjectileActor::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                       UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor == Cast<AEnemyCharacter>(OtherActor))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Projectile has hit %s"), *OtherActor->GetName());
+		
 		//Cause Damage Here
 		if (ImpactEffect == nullptr)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Impact Effect is null in %s"), *GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Impact Effect is null in: %s"), *GetName());
 			return;
 		}
+		if (DamageEffectSpecHandle == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Damage Effect is not set in: %s"), *GetName());
+			return;
+		}
+
+		if (HasAuthority())
+		{
+			if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
+			{
+				TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+				
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactEffect, GetActorLocation(), GetActorRotation());
+			}
+			
+			
+
+			Destroy();
+		}
 		
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactEffect, GetActorLocation(), GetActorRotation());
-		Destroy();
 	}
 }

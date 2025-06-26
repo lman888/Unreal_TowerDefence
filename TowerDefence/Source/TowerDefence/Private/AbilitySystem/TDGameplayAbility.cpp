@@ -5,6 +5,9 @@
 
 #include "Interaction/TowerInterface.h"
 #include "Projectiles/ProjectileActor.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "TDGameplayTags.h"
+#include "AbilitySystem/TDAbilitySystemComponent.h"
 
 UTDGameplayAbility::UTDGameplayAbility()
 {
@@ -45,6 +48,16 @@ void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 		}
 		
 		//Give Projectile a Gameplay Effect Spec for causing Damage
+		const UTDAbilitySystemComponent* SourceASC = Cast<UTDAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo()));
+		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+
+		FTDGameplayTags GameplayTags = FTDGameplayTags::Get();
+		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Basic Turret Damage: %f"), ScaledDamage));
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
+		
+		Projectile->DamageEffectSpecHandle = SpecHandle;
 		
 		Projectile->FinishSpawning(SpawnTransform);
 	}
