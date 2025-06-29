@@ -5,6 +5,7 @@
 
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
+#include "Interface/TDCombatInterface.h"
 
 UTDAttributeSet::UTDAttributeSet()
 {
@@ -20,6 +21,16 @@ void UTDAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_CONDITION_NOTIFY(UTDAttributeSet, RangedArmour, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTDAttributeSet, MovementSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTDAttributeSet, AttackRange, COND_None, REPNOTIFY_Always);
+}
+
+void UTDAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+
+	if (Attribute == GetHealthAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHealth());
+	}
 }
 
 void UTDAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -45,7 +56,17 @@ void UTDAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 			SetHealth(FMath::Clamp(NewHealth, 0.0f, GetMaxHealth()));
 
 			const bool bFatal = NewHealth <= 0;
-			
+			if (bFatal)
+			{
+				ITDCombatInterface* OwningActor = Cast<ITDCombatInterface>(GetOwningActor());
+				if (OwningActor == nullptr)
+				{
+					UE_LOG(LogTemp, Error, TEXT("Owning Actor is invalid in %s"), *GetName());
+					return;
+				}
+
+				OwningActor->HandleDeath();
+			}			
 		}
 	}
 }

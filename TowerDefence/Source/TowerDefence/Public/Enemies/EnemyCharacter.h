@@ -4,15 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/TDCombatInterface.h"
 #include "EnemyCharacter.generated.h"
 
+class UWidgetComponent;
+class UNiagaraSystem;
 class UGameplayEffect;
 class UTDAbilitySystemComponent;
 class UTDAttributeSet;
 class USphereComponent;
+class ITDCombatInterface;
+class USoundWave;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChanged, float, NewValue);
 
 UCLASS()
-class TOWERDEFENCE_API AEnemyCharacter : public ACharacter
+class TOWERDEFENCE_API AEnemyCharacter : public ACharacter, public ITDCombatInterface
 {
 	GENERATED_BODY()
 
@@ -36,13 +43,27 @@ public:
 
 	void InitializeAttributes() const;
 
+	void ApplyEffectSpec(const TSubclassOf<UGameplayEffect>& GameplayEffect, float Level) const;
+
 	UFUNCTION(BlueprintPure)
 	UTDAttributeSet* GetAttributeSet() const;
 
+	UFUNCTION()
+	virtual void HandleDeath() override;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeChanged OnHealthChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeChanged OnMaxHealthChanged;
+	
 protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
-	TSubclassOf<UGameplayEffect> DefaultAttributes;
+	TSubclassOf<UGameplayEffect> PrimaryAttributes;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> SecondaryAttributes;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
@@ -50,4 +71,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAttributeSet> AttributeSet;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	UNiagaraSystem* DeathEffect;
+	
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	USoundBase* DeathSound;
 };

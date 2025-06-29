@@ -3,9 +3,12 @@
 
 #include "Enemies/EnemyCharacter.h"
 
+#include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/TDAbilitySystemComponent.h"
 #include "AbilitySystem/TDAttributeSet.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -23,10 +26,25 @@ AEnemyCharacter::AEnemyCharacter()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	InitializeAttributes();
 
 	GetCharacterMovement()->MaxWalkSpeed =  AttributeSet->GetMovementSpeed();
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnHealthChanged.Broadcast(Data.NewValue);
+		});
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxHealthAttribute()).AddLambda(
+	[this](const FOnAttributeChangeData& Data)
+	{
+		OnMaxHealthChanged.Broadcast(Data.NewValue);
+	});
+
+	OnHealthChanged.Broadcast(AttributeSet->GetHealth());
+	OnMaxHealthChanged.Broadcast(AttributeSet->GetMaxHealth());
 }
 
 // Called every frame
@@ -50,15 +68,37 @@ UTDAbilitySystemComponent* AEnemyCharacter::GetAbilitySystemComponent() const
 
 void AEnemyCharacter::InitializeAttributes() const
 {
+	ApplyEffectSpec(PrimaryAttributes, 1.0f);
+	ApplyEffectSpec(SecondaryAttributes, 1.0f);
+}
+
+void AEnemyCharacter::ApplyEffectSpec(const TSubclassOf<UGameplayEffect>& GameplayEffect, float Level) const
+{
 	check(IsValid(GetAbilitySystemComponent()));
-	check(DefaultAttributes);
+	check(GameplayEffect);
 	
 	const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
-	const FGameplayEffectSpecHandle EffectSpec = GetAbilitySystemComponent()->MakeOutgoingSpec(DefaultAttributes, 1, ContextHandle);
+	const FGameplayEffectSpecHandle EffectSpec = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffect, 1, ContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpec.Data.Get(), GetAbilitySystemComponent());
 }
 
 UTDAttributeSet* AEnemyCharacter::GetAttributeSet() const
 {
 	return AttributeSet;
+}
+
+void AEnemyCharacter::HandleDeath()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::Printf(TEXT("Object: %s has died"), *GetName()));
+
+	if (DeathEffect == nullptr || DeathSound == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Death Sound or Death Effect has not been set in %s"), *GetName());
+		return;
+	}
+	
+	UGameplayStatics::PlaySound2D(GetWorld(), DeathSound);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathEffect, GetActorLocation(), GetActorRotation());
+	
+	Destroy();
 }

@@ -11,6 +11,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/TDAbilitySystemComponent.h"
 #include "GameplayEffects/TDGameplayEffects.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AProjectileActor::AProjectileActor()
@@ -96,9 +97,9 @@ void AProjectileActor::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent,
 				
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactEffect, GetActorLocation(), GetActorRotation());
 			}
-			
-			
 
+			UGameplayStatics::PlaySound2D(GetWorld(), ImpactSound);
+			
 			Destroy();
 		}
 		

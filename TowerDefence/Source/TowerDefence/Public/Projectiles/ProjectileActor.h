@@ -46,4 +46,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true), Category = "Effects")
 	FGameplayEffectSpecHandle DamageEffectSpecHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	USoundBase* ImpactSound;
 };
