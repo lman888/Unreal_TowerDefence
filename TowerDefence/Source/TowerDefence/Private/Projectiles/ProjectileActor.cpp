@@ -10,7 +10,6 @@
 #include "Towers/MasterTower.h"
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/TDAbilitySystemComponent.h"
-#include "GameplayEffects/TDGameplayEffects.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -53,23 +52,6 @@ void AProjectileActor::BeginPlay()
 	ProjectileMovement->HomingTargetComponent = projectileOwner->GetTargetedEnemy()->GetRootComponent();
 }
 
-void AProjectileActor::ApplyDamage() const
-{
-	AMasterTower* projectileOwner = Cast<AMasterTower>(GetOwner());
-	if (projectileOwner == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Owner is invalid in %s"), *GetName());
-		return;
-	}
-
-	AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(projectileOwner->GetTargetedEnemy());
-	if (Enemy == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Enemy is invalid in %s"), *GetName());
-		return;
-	}
-}
-
 void AProjectileActor::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -102,6 +84,5 @@ void AProjectileActor::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent,
 			
 			Destroy();
 		}
-		
 	}
 }
