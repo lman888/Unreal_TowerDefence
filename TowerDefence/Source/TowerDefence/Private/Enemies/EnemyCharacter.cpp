@@ -20,6 +20,9 @@ AEnemyCharacter::AEnemyCharacter()
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	AttributeSet = CreateDefaultSubobject<UTDAttributeSet>("AttributeSet");
+
+	HealthBarWidget = CreateDefaultSubobject<UWidgetComponent>("Health Bar Component");
+	HealthBarWidget->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned

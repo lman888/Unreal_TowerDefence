@@ -5,6 +5,8 @@
 
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "AbilitySystem/TDAbilitySystemComponent.h"
+#include "AbilitySystem/TDAttributeSet.h"
 
 // Sets default values
 AHomeBase::AHomeBase()
@@ -16,6 +18,11 @@ AHomeBase::AHomeBase()
 	SetRootComponent(Base);
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>("Box Collision");
 	BoxCollision->SetupAttachment(Base);
+
+	AbilitySystemComponent = CreateDefaultSubobject<UTDAbilitySystemComponent>("AbilitySystem Component");
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	AttributeSet = CreateDefaultSubobject<UTDAttributeSet>("AttributeSet");
 
 }
 

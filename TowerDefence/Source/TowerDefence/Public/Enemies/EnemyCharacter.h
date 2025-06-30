@@ -65,6 +65,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> SecondaryAttributes;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TObjectPtr<UWidgetComponent> HealthBarWidget;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAbilitySystemComponent> AbilitySystemComponent;
@@ -77,4 +80,5 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	USoundBase* DeathSound;
+
 };

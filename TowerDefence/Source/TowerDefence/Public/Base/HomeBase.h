@@ -8,6 +8,9 @@
 
 class UBoxComponent;
 class UStaticMeshComponent;
+class UTDAbilitySystemComponent;
+class UTDAttributeSet;
+class UGameplayEffect;
 
 UCLASS()
 class TOWERDEFENCE_API AHomeBase : public AActor
@@ -34,4 +37,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Box Collision")
 	TObjectPtr<UBoxComponent> BoxCollision;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> PrimaryAttributes;
+
+private:
+
+	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
+	TObjectPtr<UTDAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
+	TObjectPtr<UTDAttributeSet> AttributeSet;
 };
