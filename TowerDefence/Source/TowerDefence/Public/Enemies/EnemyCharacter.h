@@ -7,6 +7,7 @@
 #include "Interface/TDCombatInterface.h"
 #include "EnemyCharacter.generated.h"
 
+class UGameplayAbility;
 class UWidgetComponent;
 class UNiagaraSystem;
 class UGameplayEffect;
@@ -41,6 +42,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	UTDAbilitySystemComponent* GetAbilitySystemComponent() const;
 
+	UFUNCTION(BlueprintPure)
+	AActor* GetTarget() const;
+
 	void InitializeAttributes() const;
 
 	void ApplyEffectSpec(const TSubclassOf<UGameplayEffect>& GameplayEffect, float Level) const;
@@ -68,6 +72,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TObjectPtr<UWidgetComponent> HealthBarWidget;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target")
+	TObjectPtr<AActor> Target;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAbilitySystemComponent> AbilitySystemComponent;
@@ -75,10 +82,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAttributeSet> AttributeSet;
 
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TSubclassOf<UGameplayAbility> DamageAbility;
+	
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UNiagaraSystem* DeathEffect;
 	
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	USoundBase* DeathSound;
-
 };

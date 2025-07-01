@@ -6,11 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "HomeBase.generated.h"
 
+class UWidgetComponent;
 class UBoxComponent;
 class UStaticMeshComponent;
 class UTDAbilitySystemComponent;
 class UTDAttributeSet;
 class UGameplayEffect;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHomeBaseAttributeChanged, float, NewValue);
 
 UCLASS()
 class TOWERDEFENCE_API AHomeBase : public AActor
@@ -40,11 +43,26 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> SecondaryAttributes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TObjectPtr<UWidgetComponent> HealthBar;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnHomeBaseAttributeChanged OnHealthChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnHomeBaseAttributeChanged OnMaxHealthChanged;
+	
 private:
 
+	void ApplyEffectSpec(const TSubclassOf<UGameplayEffect>& GameplayEffect, float Level) const;
+	
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAttributeSet> AttributeSet;
+
 };

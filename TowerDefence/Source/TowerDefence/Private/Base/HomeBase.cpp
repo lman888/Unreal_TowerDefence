@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "AbilitySystem/TDAbilitySystemComponent.h"
 #include "AbilitySystem/TDAttributeSet.h"
+#include "Components/WidgetComponent.h"
 
 // Sets default values
 AHomeBase::AHomeBase()
@@ -24,13 +25,32 @@ AHomeBase::AHomeBase()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	AttributeSet = CreateDefaultSubobject<UTDAttributeSet>("AttributeSet");
 
+	HealthBar = CreateDefaultSubobject<UWidgetComponent>("Home Health Bar");
+	HealthBar->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
 void AHomeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	ApplyEffectSpec(PrimaryAttributes, 1);
+	ApplyEffectSpec(SecondaryAttributes, 1);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddLambda(
+	[this](const FOnAttributeChangeData& Data)
+	{
+		OnHealthChanged.Broadcast(Data.NewValue);
+	});
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxHealthAttribute()).AddLambda(
+	[this](const FOnAttributeChangeData& Data)
+	{
+		OnMaxHealthChanged.Broadcast(Data.NewValue);
+	});
+
+	OnHealthChanged.Broadcast(AttributeSet->GetHealth());
+	OnMaxHealthChanged.Broadcast(AttributeSet->GetMaxHealth());
 }
 
 // Called every frame
@@ -40,3 +60,11 @@ void AHomeBase::Tick(float DeltaTime)
 
 }
 
+void AHomeBase::ApplyEffectSpec(const TSubclassOf<UGameplayEffect>& GameplayEffect, float Level) const
+{
+	check(IsValid(AbilitySystemComponent));
+	check(GameplayEffect);
+	
+	const FGameplayEffectSpecHandle Spec = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, Level, AbilitySystemComponent->MakeEffectContext());
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*Spec.Data.Get());
+}

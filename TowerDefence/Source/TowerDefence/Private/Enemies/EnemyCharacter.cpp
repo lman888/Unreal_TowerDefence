@@ -6,6 +6,8 @@
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/TDAbilitySystemComponent.h"
 #include "AbilitySystem/TDAttributeSet.h"
+#include "Base/HomeBase.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -32,13 +34,15 @@ void AEnemyCharacter::BeginPlay()
 	
 	InitializeAttributes();
 
+	AbilitySystemComponent->AddCharacterAbility(DamageAbility);
+
 	GetCharacterMovement()->MaxWalkSpeed =  AttributeSet->GetMovementSpeed();
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddLambda(
-		[this](const FOnAttributeChangeData& Data)
-		{
-			OnHealthChanged.Broadcast(Data.NewValue);
-		});
+	[this](const FOnAttributeChangeData& Data)
+	{
+		OnHealthChanged.Broadcast(Data.NewValue);
+	});
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxHealthAttribute()).AddLambda(
 	[this](const FOnAttributeChangeData& Data)
@@ -67,6 +71,11 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 UTDAbilitySystemComponent* AEnemyCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+AActor* AEnemyCharacter::GetTarget() const
+{
+	return Target;
 }
 
 void AEnemyCharacter::InitializeAttributes() const
