@@ -60,6 +60,11 @@ void AHomeBase::Tick(float DeltaTime)
 
 }
 
+void AHomeBase::HandleDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Home Base has died"));
+}
+
 void AHomeBase::ApplyEffectSpec(const TSubclassOf<UGameplayEffect>& GameplayEffect, float Level) const
 {
 	check(IsValid(AbilitySystemComponent));

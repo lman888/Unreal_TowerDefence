@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interface/TDCombatInterface.h"
 #include "HomeBase.generated.h"
 
 class UWidgetComponent;
@@ -16,7 +17,7 @@ class UGameplayEffect;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHomeBaseAttributeChanged, float, NewValue);
 
 UCLASS()
-class TOWERDEFENCE_API AHomeBase : public AActor
+class TOWERDEFENCE_API AHomeBase : public AActor, public ITDCombatInterface
 {
 	GENERATED_BODY()
 	
@@ -31,6 +32,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	virtual void HandleDeath() override;
 
 protected:
 

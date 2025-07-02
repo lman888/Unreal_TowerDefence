@@ -14,7 +14,6 @@ class UGameplayEffect;
 class UTDAbilitySystemComponent;
 class UTDAttributeSet;
 class USphereComponent;
-class ITDCombatInterface;
 class USoundWave;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChanged, float, NewValue);
