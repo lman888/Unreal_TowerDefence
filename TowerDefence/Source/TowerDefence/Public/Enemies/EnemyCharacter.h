@@ -7,6 +7,7 @@
 #include "Interface/TDCombatInterface.h"
 #include "EnemyCharacter.generated.h"
 
+class AHomeBase;
 class UGameplayAbility;
 class UWidgetComponent;
 class UNiagaraSystem;
@@ -42,7 +43,7 @@ public:
 	UTDAbilitySystemComponent* GetAbilitySystemComponent() const;
 
 	UFUNCTION(BlueprintPure)
-	AActor* GetTarget() const;
+	AHomeBase* GetTarget() const;
 
 	void InitializeAttributes() const;
 
@@ -61,7 +62,6 @@ public:
 	FOnAttributeChanged OnMaxHealthChanged;
 	
 protected:
-	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
 
@@ -72,7 +72,10 @@ protected:
 	TObjectPtr<UWidgetComponent> HealthBarWidget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target")
-	TObjectPtr<AActor> Target;
+	TObjectPtr<AHomeBase> Target;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	TSubclassOf<UGameplayAbility> DamageAbility;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
@@ -80,9 +83,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAttributeSet> AttributeSet;
-
-	UPROPERTY(EditAnywhere, Category = "Abilities")
-	TSubclassOf<UGameplayAbility> DamageAbility;
+	
 	
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UNiagaraSystem* DeathEffect;

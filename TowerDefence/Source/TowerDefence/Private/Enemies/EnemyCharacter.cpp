@@ -7,7 +7,6 @@
 #include "AbilitySystem/TDAbilitySystemComponent.h"
 #include "AbilitySystem/TDAttributeSet.h"
 #include "Base/HomeBase.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -73,7 +72,7 @@ UTDAbilitySystemComponent* AEnemyCharacter::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-AActor* AEnemyCharacter::GetTarget() const
+AHomeBase* AEnemyCharacter::GetTarget() const
 {
 	return Target;
 }

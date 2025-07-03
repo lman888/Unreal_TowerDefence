@@ -36,6 +36,9 @@ public:
 	UFUNCTION()
 	virtual void HandleDeath() override;
 
+	UFUNCTION()
+	UTDAbilitySystemComponent* GetAbilitySystemComponent();
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Mesh")
