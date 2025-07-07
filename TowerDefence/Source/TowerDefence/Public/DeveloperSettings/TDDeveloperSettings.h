@@ -20,7 +20,7 @@ public:
 
 	UTDDeveloperSettings();
 
-	UPROPERTY(config, EditAnywhere, Category = "Towers")
+	UPROPERTY(config, EditAnywhere, BlueprintReadWrite, Category = "Towers")
 	TArray<TSubclassOf<AMasterTower>> Towers;
 	
 	UFUNCTION(BlueprintCallable)
