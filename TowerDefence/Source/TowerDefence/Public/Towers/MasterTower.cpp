@@ -4,6 +4,7 @@
 
 #include "AbilitySystem/TDAbilitySystemComponent.h"
 #include "AbilitySystem/TDAttributeSet.h"
+#include "AbilitySystem/TDGameplayAbility.h"
 #include "Components/BoxComponent.h"
 
 // Sets default values
@@ -58,6 +59,15 @@ void AMasterTower::BeginPlay()
 	Super::BeginPlay();
 	
 	AddTowerAbility(TowerAbilities);
+
+	UTDGameplayAbility* Ability = Cast<UTDGameplayAbility>(TowerAbilities[0].GetDefaultObject());
+	if (Ability == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TowerAbilities does not have any Abilities assigned in it."));
+		return;
+	}
+
+	TowerInfo.TowerDamage = Ability->Damage.AsInteger();
 }
 
 // Called every frame

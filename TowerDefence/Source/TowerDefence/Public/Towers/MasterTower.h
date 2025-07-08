@@ -15,6 +15,24 @@ class UBoxComponent;
 class UAbilitySystemComponent;
 class UAttributeSet;
 
+USTRUCT(BlueprintType)
+struct FTowerInformation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FString TowerName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FString TowerDescription;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int TowerDamage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UTexture2D* TowerImage;
+};
+
 UCLASS()
 class TOWERDEFENCE_API AMasterTower : public AActor, public IAbilitySystemInterface, public ITowerInterface
 {
@@ -84,6 +102,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> TowerAttributes;
 
-	UPROPERTY(EditAnywhere, Category = "Abilities")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> TowerAbilities;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FTowerInformation TowerInfo;
 };
