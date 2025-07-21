@@ -99,6 +99,11 @@ AActor* AMasterTower::GetTargetedEnemy()
 	return TargetedEnemy;
 }
 
+TSubclassOf<AMasterTower> AMasterTower::GetTowerUpgrade()
+{
+	return TowerUpgrade;
+}
+
 FTransform AMasterTower::GetProjectileSpawnLocation()
 {
 	return ProjectileTransform->GetComponentTransform();

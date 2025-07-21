@@ -61,6 +61,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	AActor* GetTargetedEnemy();
 
+	UFUNCTION(BlueprintPure)
+	TSubclassOf<AMasterTower> GetTowerUpgrade();
+
 protected:
 	virtual FTransform GetProjectileSpawnLocation() override;
 
@@ -107,4 +110,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FTowerInformation TowerInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<AMasterTower> TowerUpgrade;
 };
