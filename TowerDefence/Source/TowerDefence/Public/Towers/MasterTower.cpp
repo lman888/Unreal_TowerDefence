@@ -60,16 +60,9 @@ void AMasterTower::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	AddTowerAbility(TowerAbilities);
+	AddTowerAbility(TowerAbility);
 
-	UTDGameplayAbility* Ability = Cast<UTDGameplayAbility>(TowerAbilities[0].GetDefaultObject());
-	if (Ability == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TowerAbilities does not have any Abilities assigned in it."));
-		return;
-	}
-
-	TowerInfo.TowerDamage = Ability->Damage.AsInteger();
+	UpdateTowerUpgradeWidgetInformation();
 }
 
 // Called every frame
@@ -100,15 +93,25 @@ AActor* AMasterTower::GetTargetedEnemy()
 {
 	return TargetedEnemy;
 }
-
-TSubclassOf<AMasterTower> AMasterTower::GetTowerUpgrade()
+int AMasterTower::GetTowerLevel() const
 {
-	return TowerUpgrade;
+	return TowerLevel;
 }
 
 FTransform AMasterTower::GetProjectileSpawnLocation()
 {
 	return ProjectileTransform->GetComponentTransform();
+}
+
+void AMasterTower::UpgradeTower()
+{
+	TowerLevel++;
+
+	AbilitySystemComponent->UpgradeAbility(TowerAbility);
+	
+	UpdateTowerUpgradeWidgetInformation();
+
+	//Change out Tower Mesh here
 }
 
 void AMasterTower::InitializeAttributes() const
@@ -119,7 +122,7 @@ void AMasterTower::InitializeAttributes() const
 		return;
 	}
 
-	const FGameplayEffectSpecHandle TowerAttribute = AbilitySystemComponent->MakeOutgoingSpec(TowerAttributes, 1, AbilitySystemComponent->MakeEffectContext());
+	const FGameplayEffectSpecHandle TowerAttribute = AbilitySystemComponent->MakeOutgoingSpec(TowerAttributes, GetTowerLevel(), AbilitySystemComponent->MakeEffectContext());
 	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*TowerAttribute.Data.Get());
 }
 
@@ -131,4 +134,23 @@ void AMasterTower::AddTowerAbility(TSubclassOf<UGameplayAbility>& Ability) const
 	}
 	
 	AbilitySystemComponent->AddCharacterAbility(Ability);
+}
+
+void AMasterTower::UpdateTowerUpgradeWidgetInformation()
+{
+	UTDGameplayAbility* Ability = Cast<UTDGameplayAbility>(TowerAbility.GetDefaultObject());
+	if (Ability == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ability is no valid!"));
+		return;
+	}
+	
+	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromClass(TowerAbility);
+	if (Spec == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spec is no valid!"));
+		return;
+	}
+	
+	TowerInfo.TowerDamage = Ability->Damage.GetValueAtLevel(Spec->Level);
 }

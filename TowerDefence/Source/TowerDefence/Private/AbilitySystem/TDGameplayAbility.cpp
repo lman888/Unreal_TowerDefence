@@ -8,6 +8,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "TDGameplayTags.h"
 #include "AbilitySystem/TDAbilitySystemComponent.h"
+#include "Towers/MasterTower.h"
 
 UTDGameplayAbility::UTDGameplayAbility()
 {
@@ -47,12 +48,19 @@ void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 			return;
 		}
 		
+		AMasterTower* Owner = Cast<AMasterTower>(GetAvatarActorFromActorInfo());
+		if (Owner == nullptr)
+		{
+			return;
+		}
+		
+		
 		//Give Projectile a Gameplay Effect Spec for causing Damage
 		const UTDAbilitySystemComponent* SourceASC = Cast<UTDAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo()));
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
-
+		
 		FTDGameplayTags GameplayTags = FTDGameplayTags::Get();
-		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+		const float ScaledDamage = Damage.GetValueAtLevel(SpecHandle.Data.Get()->GetLevel());
 
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Basic Turret Damage: %f"), ScaledDamage));
 		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);

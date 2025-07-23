@@ -61,11 +61,13 @@ public:
 	UFUNCTION(BlueprintPure)
 	AActor* GetTargetedEnemy();
 
-	UFUNCTION(BlueprintPure)
-	TSubclassOf<AMasterTower> GetTowerUpgrade();
+	int GetTowerLevel() const;
 
 protected:
 	virtual FTransform GetProjectileSpawnLocation() override;
+
+	UFUNCTION(BlueprintCallable)
+	void UpgradeTower();
 
 private:
 
@@ -74,9 +76,10 @@ private:
 	void InitializeAttributes() const;
 
 	void AddTowerAbility(TSubclassOf<UGameplayAbility>& Ability) const;
+
+	void UpdateTowerUpgradeWidgetInformation();
 	
 protected:
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Mesh")
 	TObjectPtr<UStaticMeshComponent> TowerBase;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Mesh")
@@ -106,11 +109,11 @@ protected:
 	TSubclassOf<UGameplayEffect> TowerAttributes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
-	TSubclassOf<UGameplayAbility> TowerAbilities;
+	TSubclassOf<UGameplayAbility> TowerAbility;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FTowerInformation TowerInfo;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<AMasterTower> TowerUpgrade;
+	UPROPERTY(EditDefaultsOnly, Category = "Level")
+	int TowerLevel = 1;
 };

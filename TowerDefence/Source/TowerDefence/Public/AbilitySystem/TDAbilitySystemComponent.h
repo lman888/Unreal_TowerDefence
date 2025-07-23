@@ -17,4 +17,6 @@ class TOWERDEFENCE_API UTDAbilitySystemComponent : public UAbilitySystemComponen
 
 public:
 	void AddCharacterAbility(TSubclassOf<UGameplayAbility>& Ability);
+
+	void UpgradeAbility(TSubclassOf<UGameplayAbility>& Ability) const;
 };
