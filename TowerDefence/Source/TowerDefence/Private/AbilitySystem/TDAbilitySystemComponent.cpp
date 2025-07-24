@@ -5,18 +5,30 @@
 
 #include "AbilitySystem/TDGameplayAbility.h"
 #include "Towers/MasterTower.h"
+#include "Enemies/EnemyCharacter.h"
 
 void UTDAbilitySystemComponent::AddCharacterAbility(TSubclassOf<UGameplayAbility>& Ability)
 {
-	AMasterTower* Owner = Cast<AMasterTower>(GetAvatarActor());
-	if (Owner == nullptr)
+	//Do this a better way in future
+
+	AMasterTower* TowerAbility = Cast<AMasterTower>(GetAvatarActor());
+	if (TowerAbility)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Owner is invalid!"));
+		const FGameplayAbilitySpec ChosenAbility = FGameplayAbilitySpec(*Ability, TowerAbility->GetTowerLevel());
+		GiveAbility(ChosenAbility);
+		return;
+	}
+
+	AEnemyCharacter* UFOAbility = Cast<AEnemyCharacter>(GetAvatarActor());
+	if (UFOAbility)
+	{
+		const FGameplayAbilitySpec ChosenAbility = FGameplayAbilitySpec(*Ability, 1);
+		//Dont forget about the AI, we use this as well to give them the ability
+		GiveAbility(ChosenAbility);
 		return;
 	}
 	
-	const FGameplayAbilitySpec ChosenAbility = FGameplayAbilitySpec(*Ability, Owner->GetTowerLevel());
-	GiveAbility(ChosenAbility);
+	UE_LOG(LogTemp, Display, TEXT("Owner is invalid!"));
 }
 
 void UTDAbilitySystemComponent::UpgradeAbility(TSubclassOf<UGameplayAbility>& Ability) const
