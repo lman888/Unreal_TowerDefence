@@ -43,6 +43,8 @@ AMasterTower::AMasterTower()
     }
 
 	TargetedEnemy = nullptr;
+
+	TowerLevel = 0;
 }
 
 UAbilitySystemComponent* AMasterTower::GetAbilitySystemComponent() const
@@ -105,13 +107,19 @@ FTransform AMasterTower::GetProjectileSpawnLocation()
 
 void AMasterTower::UpgradeTower()
 {
+	if (TowerLevel == MaxTowerLevel)
+	{
+		return;
+	}
+	
+	//Change out Tower Mesh here
+	SetTowerHeadMaterial();
+	
 	TowerLevel++;
 
 	AbilitySystemComponent->UpgradeAbility(TowerAbility);
 	
 	UpdateTowerUpgradeWidgetInformation();
-
-	//Change out Tower Mesh here
 }
 
 void AMasterTower::InitializeAttributes() const
@@ -153,4 +161,16 @@ void AMasterTower::UpdateTowerUpgradeWidgetInformation()
 	}
 	
 	TowerInfo.TowerDamage = Ability->Damage.GetValueAtLevel(Spec->Level);
+}
+
+void AMasterTower::SetTowerHeadMaterial()
+{
+	for (int i = 0; i < TowerUpgradeMaterial.Num(); i++)
+	{
+		if (i == TowerLevel)
+		{
+			TowerHead->SetMaterial(0, TowerUpgradeMaterial[i]);
+			return;
+		}
+	}
 }

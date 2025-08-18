@@ -61,9 +61,14 @@ public:
 	UFUNCTION(BlueprintPure)
 	AActor* GetTargetedEnemy();
 
+	UFUNCTION(BlueprintPure)
 	int GetTowerLevel() const;
 
 protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Textures")
+	TArray<UMaterialInterface*> TowerUpgradeMaterial;
+	
 	virtual FTransform GetProjectileSpawnLocation() override;
 
 	UFUNCTION(BlueprintCallable)
@@ -115,5 +120,10 @@ protected:
 	FTowerInformation TowerInfo;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Level")
-	int TowerLevel = 1;
+	int TowerLevel;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Level")
+	int MaxTowerLevel;
+
+	void SetTowerHeadMaterial();
 };
