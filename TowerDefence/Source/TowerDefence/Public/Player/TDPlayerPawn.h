@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "TDPlayerPawn.generated.h"
 
+class UInteractionComponent;
+
 UCLASS()
 class TOWERDEFENCE_API ATDPlayerPawn : public APawn
 {
@@ -32,8 +34,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "InteractionComponent")
+	TObjectPtr<UInteractionComponent> InteractionComponent;
 
+private:
 	int CoinAmount;
 
 };

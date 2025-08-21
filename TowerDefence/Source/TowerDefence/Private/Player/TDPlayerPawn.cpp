@@ -2,13 +2,19 @@
 
 #include "Player/TDPlayerPawn.h"
 
+#include "Interaction/InteractionComponent.h"
+
 // Sets default values
 ATDPlayerPawn::ATDPlayerPawn()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	bReplicates = true;
+	
 	CoinAmount = 0;
+
+	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 
 }
 
