@@ -49,7 +49,10 @@ void AProjectileActor::BeginPlay()
 		return;
 	}
 	
-	ProjectileMovement->HomingTargetComponent = projectileOwner->GetTargetedEnemy()->GetRootComponent();
+	if (HasAuthority())
+	{
+		ProjectileMovement->HomingTargetComponent = projectileOwner->GetTargetedEnemy()->GetRootComponent();
+	}
 }
 
 void AProjectileActor::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

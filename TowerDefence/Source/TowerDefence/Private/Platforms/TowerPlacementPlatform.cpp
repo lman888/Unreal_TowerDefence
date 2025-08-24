@@ -3,6 +3,7 @@
 
 #include "Platforms/TowerPlacementPlatform.h"
 
+#include "IAutomationControllerManager.h"
 #include "Components/BoxComponent.h"
 #include "Towers/MasterTower.h"
 
@@ -52,6 +53,9 @@ void ATowerPlacementPlatform::SpawnTowerOnPlatform(TSubclassOf<AMasterTower> Tow
 	SpawnTransform.SetLocation(SpawnPoint->GetComponentLocation());
 	SpawnTransform.SetRotation(DefaultTower->GetActorQuat());
 	SpawnTransform.SetScale3D(DefaultTower->GetActorScale3D());
-	
-	AMasterTower* SpawnedTower = GetWorld()->SpawnActor<AMasterTower>(Tower, SpawnTransform, SpawnParams);
+
+	if (HasAuthority())
+	{
+		GetWorld()->SpawnActor<AMasterTower>(Tower, SpawnTransform, SpawnParams);
+	}
 }

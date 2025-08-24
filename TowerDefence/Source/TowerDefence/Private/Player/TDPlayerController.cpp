@@ -3,3 +3,9 @@
 
 #include "Player/TDPlayerController.h"
 
+#include "Platforms/TowerPlacementPlatform.h"
+
+ATDPlayerController::ATDPlayerController()
+{
+	bReplicates = true;
+}

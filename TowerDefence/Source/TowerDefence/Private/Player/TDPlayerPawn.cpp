@@ -3,6 +3,7 @@
 #include "Player/TDPlayerPawn.h"
 
 #include "Interaction/InteractionComponent.h"
+#include "Platforms/TowerPlacementPlatform.h"
 
 // Sets default values
 ATDPlayerPawn::ATDPlayerPawn()
@@ -49,3 +50,11 @@ void ATDPlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 }
 
+void ATDPlayerPawn::Server_SpawnTower_Implementation(ATowerPlacementPlatform* Platform,
+	TSubclassOf<AMasterTower> Tower)
+{
+	if (Platform)
+	{
+		Platform->SpawnTowerOnPlatform(Tower);
+	}
+}

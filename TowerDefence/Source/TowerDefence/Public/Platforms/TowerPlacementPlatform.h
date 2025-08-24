@@ -26,6 +26,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void SpawnTowerOnPlatform(TSubclassOf<AMasterTower> Tower);
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	TObjectPtr<UStaticMeshComponent> Platform;
@@ -33,9 +35,4 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Point")
 	TObjectPtr<UBoxComponent> SpawnPoint;
 	
-private:
-	UFUNCTION(BlueprintCallable)
-	void SpawnTowerOnPlatform(TSubclassOf<AMasterTower> Tower);
-
-
 };

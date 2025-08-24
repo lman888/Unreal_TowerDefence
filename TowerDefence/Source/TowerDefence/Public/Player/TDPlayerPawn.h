@@ -36,7 +36,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "InteractionComponent")
 	TObjectPtr<UInteractionComponent> InteractionComponent;
-
+	
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_SpawnTower(ATowerPlacementPlatform* Platform, TSubclassOf<AMasterTower> Tower);
+	
 private:
 	int CoinAmount;
 
