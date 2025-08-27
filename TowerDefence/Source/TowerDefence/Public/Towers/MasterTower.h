@@ -15,6 +15,8 @@ class UBoxComponent;
 class UAbilitySystemComponent;
 class UAttributeSet;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageChanged, int, NewDamage);
+
 USTRUCT(BlueprintType)
 struct FTowerInformation
 {
@@ -119,14 +121,27 @@ protected:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> TowerAbility;
 
-	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(ReplicatedUsing=OnRep_TowerUpdateInfo, EditDefaultsOnly, BlueprintReadOnly)
 	FTowerInformation TowerInfo;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Level")
+	
+	UPROPERTY(ReplicatedUsing=OnRep_TowerLevelUp, EditDefaultsOnly, Category = "Level")
 	int TowerLevel;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Level")
 	int MaxTowerLevel;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnDamageChanged OnDamageChanged;
+	
+	UFUNCTION(BlueprintPure)
+	FTowerInformation GetTowerInfo();
+	
+	UFUNCTION()
+	void OnRep_TowerLevelUp();
+
+	UFUNCTION()
+	void OnRep_TowerUpdateInfo();
+	
+	UFUNCTION(Server, Reliable)
 	void SetTowerHeadMaterial();
 };

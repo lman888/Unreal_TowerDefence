@@ -62,7 +62,7 @@ UAttributeSet* AMasterTower::GetAttributeSet() const
 void AMasterTower::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	AddTowerAbility(TowerAbility);
 
 	UpdateTowerUpgradeWidgetInformation();
@@ -150,24 +150,21 @@ void AMasterTower::AddTowerAbility(TSubclassOf<UGameplayAbility>& Ability) const
 
 void AMasterTower::UpdateTowerUpgradeWidgetInformation_Implementation()
 {
-	if (HasAuthority())
+	UTDGameplayAbility* Ability = Cast<UTDGameplayAbility>(TowerAbility.GetDefaultObject());
+	if (Ability == nullptr)
 	{
-		UTDGameplayAbility* Ability = Cast<UTDGameplayAbility>(TowerAbility.GetDefaultObject());
-		if (Ability == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Ability is no valid!"));
-			return;
-		}
-
-		FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromClass(TowerAbility);
-		if (Spec == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Spec is no valid!"));
-			return;
-		}
-
-		TowerInfo.TowerDamage = Ability->Damage.GetValueAtLevel(Spec->Level);
+		UE_LOG(LogTemp, Warning, TEXT("Ability is no valid!"));
+		return;
 	}
+
+	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromClass(TowerAbility);
+	if (Spec == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spec is no valid!"));
+		return;
+	}
+
+	TowerInfo.TowerDamage = Ability->Damage.GetValueAtLevel(Spec->Level);
 }
 
 void AMasterTower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -176,10 +173,28 @@ void AMasterTower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 	DOREPLIFETIME(AMasterTower, TowerInfo);
 	DOREPLIFETIME(AMasterTower, TowerAbility);
-	DOREPLIFETIME(AMasterTower, AbilitySystemComponent);
+	DOREPLIFETIME(AMasterTower, TowerLevel);
 }
 
-void AMasterTower::SetTowerHeadMaterial()
+FTowerInformation AMasterTower::GetTowerInfo()
+{
+	return TowerInfo;
+}
+
+void AMasterTower::OnRep_TowerLevelUp()
+{
+	SetTowerHeadMaterial();
+}
+
+void AMasterTower::OnRep_TowerUpdateInfo()
+{
+	//Print Test
+	UE_LOG(LogTemp, Display, TEXT("Tower Damage is: %d"), TowerInfo.TowerDamage);
+
+	OnDamageChanged.Broadcast(TowerInfo.TowerDamage);
+}
+
+void AMasterTower::SetTowerHeadMaterial_Implementation()
 {
 	int32 TowerMeshIndex = TowerLevel - 1;
 
