@@ -10,11 +10,11 @@
 // Sets default values
 AMasterTower::AMasterTower()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	bReplicates = true;
-	
+
 	AbilitySystemComponent = CreateDefaultSubobject<UTDAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
@@ -31,20 +31,20 @@ AMasterTower::AMasterTower()
 	ProjectileTransform = CreateDefaultSubobject<UStaticMeshComponent>("Projectile Spawn");
 	ProjectileTransform->SetupAttachment(TowerHead);
 
-    if (AttributeSet == nullptr)
-    {
-	    UE_LOG(LogTemp, Warning, TEXT("Attribute Set Null for %s"), *GetName());
-    	return;
-    }
+	if (AttributeSet == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attribute Set Null for %s"), *GetName());
+		return;
+	}
 
-    if (!HasAuthority())
-    {
-    	return;
-    }
+	if (!HasAuthority())
+	{
+		return;
+	}
 
 	TargetedEnemy = nullptr;
 
-	TowerLevel = 0;
+	TowerLevel = 1;
 }
 
 UAbilitySystemComponent* AMasterTower::GetAbilitySystemComponent() const
@@ -61,7 +61,7 @@ UAttributeSet* AMasterTower::GetAttributeSet() const
 void AMasterTower::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	AddTowerAbility(TowerAbility);
 
 	UpdateTowerUpgradeWidgetInformation();
@@ -107,18 +107,18 @@ FTransform AMasterTower::GetProjectileSpawnLocation()
 
 void AMasterTower::UpgradeTower()
 {
+	//Change out Tower Mesh here
+	SetTowerHeadMaterial();
+
 	if (TowerLevel == MaxTowerLevel)
 	{
 		return;
 	}
-	
-	//Change out Tower Mesh here
-	SetTowerHeadMaterial();
-	
+
 	TowerLevel++;
 
 	AbilitySystemComponent->UpgradeAbility(TowerAbility);
-	
+
 	UpdateTowerUpgradeWidgetInformation();
 }
 
@@ -140,7 +140,7 @@ void AMasterTower::AddTowerAbility(TSubclassOf<UGameplayAbility>& Ability) const
 	{
 		return;
 	}
-	
+
 	AbilitySystemComponent->AddCharacterAbility(Ability);
 }
 
@@ -152,25 +152,23 @@ void AMasterTower::UpdateTowerUpgradeWidgetInformation()
 		UE_LOG(LogTemp, Warning, TEXT("Ability is no valid!"));
 		return;
 	}
-	
+
 	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromClass(TowerAbility);
 	if (Spec == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Spec is no valid!"));
 		return;
 	}
-	
+
 	TowerInfo.TowerDamage = Ability->Damage.GetValueAtLevel(Spec->Level);
 }
 
 void AMasterTower::SetTowerHeadMaterial()
 {
-	for (int i = 0; i < TowerUpgradeMaterial.Num(); i++)
+	int32 TowerMeshIndex = TowerLevel - 1;
+
+	if (TowerUpgradeMaterial.IsValidIndex(TowerMeshIndex))
 	{
-		if (i == TowerLevel)
-		{
-			TowerHead->SetMaterial(0, TowerUpgradeMaterial[i]);
-			return;
-		}
+		TowerHead->SetMaterial(0, TowerUpgradeMaterial[TowerMeshIndex]);
 	}
 }
