@@ -6,6 +6,7 @@
 #include "AbilitySystem/TDAttributeSet.h"
 #include "AbilitySystem/TDGameplayAbility.h"
 #include "Components/BoxComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AMasterTower::AMasterTower()
@@ -105,21 +106,24 @@ FTransform AMasterTower::GetProjectileSpawnLocation()
 	return ProjectileTransform->GetComponentTransform();
 }
 
-void AMasterTower::UpgradeTower()
+void AMasterTower::UpgradeTower_Implementation()
 {
-	//Change out Tower Mesh here
-	SetTowerHeadMaterial();
-
-	if (TowerLevel == MaxTowerLevel)
+	if (HasAuthority())
 	{
-		return;
+		//Change out Tower Mesh here
+		SetTowerHeadMaterial();
+
+		if (TowerLevel == MaxTowerLevel)
+		{
+			return;
+		}
+
+		TowerLevel++;
+
+		AbilitySystemComponent->UpgradeAbility(TowerAbility);
+
+		UpdateTowerUpgradeWidgetInformation();
 	}
-
-	TowerLevel++;
-
-	AbilitySystemComponent->UpgradeAbility(TowerAbility);
-
-	UpdateTowerUpgradeWidgetInformation();
 }
 
 void AMasterTower::InitializeAttributes() const
@@ -144,23 +148,35 @@ void AMasterTower::AddTowerAbility(TSubclassOf<UGameplayAbility>& Ability) const
 	AbilitySystemComponent->AddCharacterAbility(Ability);
 }
 
-void AMasterTower::UpdateTowerUpgradeWidgetInformation()
+void AMasterTower::UpdateTowerUpgradeWidgetInformation_Implementation()
 {
-	UTDGameplayAbility* Ability = Cast<UTDGameplayAbility>(TowerAbility.GetDefaultObject());
-	if (Ability == nullptr)
+	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Ability is no valid!"));
-		return;
-	}
+		UTDGameplayAbility* Ability = Cast<UTDGameplayAbility>(TowerAbility.GetDefaultObject());
+		if (Ability == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Ability is no valid!"));
+			return;
+		}
 
-	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromClass(TowerAbility);
-	if (Spec == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Spec is no valid!"));
-		return;
-	}
+		FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromClass(TowerAbility);
+		if (Spec == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Spec is no valid!"));
+			return;
+		}
 
-	TowerInfo.TowerDamage = Ability->Damage.GetValueAtLevel(Spec->Level);
+		TowerInfo.TowerDamage = Ability->Damage.GetValueAtLevel(Spec->Level);
+	}
+}
+
+void AMasterTower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMasterTower, TowerInfo);
+	DOREPLIFETIME(AMasterTower, TowerAbility);
+	DOREPLIFETIME(AMasterTower, AbilitySystemComponent);
 }
 
 void AMasterTower::SetTowerHeadMaterial()

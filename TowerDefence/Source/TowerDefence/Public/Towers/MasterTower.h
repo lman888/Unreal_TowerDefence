@@ -37,8 +37,8 @@ UCLASS()
 class TOWERDEFENCE_API AMasterTower : public AActor, public IAbilitySystemInterface, public ITowerInterface
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AMasterTower();
 
@@ -46,12 +46,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UAttributeSet* GetAttributeSet() const;
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -68,10 +68,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Textures")
 	TArray<UMaterialInterface*> TowerUpgradeMaterial;
-	
+
 	virtual FTransform GetProjectileSpawnLocation() override;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void UpgradeTower();
 
 private:
@@ -82,8 +82,11 @@ private:
 
 	void AddTowerAbility(TSubclassOf<UGameplayAbility>& Ability) const;
 
+	UFUNCTION(Server, Reliable)
 	void UpdateTowerUpgradeWidgetInformation();
-	
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Mesh")
 	TObjectPtr<UStaticMeshComponent> TowerBase;
@@ -95,10 +98,10 @@ protected:
 	TObjectPtr<UStaticMeshComponent> ProjectileTransform;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Targeting")
 	float ClosestDistance;
-	
-	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
+
+	UPROPERTY(Replicated, EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAbilitySystemComponent> AbilitySystemComponent;
-	
+
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UAttributeSet> AttributeSet;
 	UPROPERTY(EditAnywhere, Category = "Tower Hit Box")
@@ -109,14 +112,14 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Targeting")
 	TObjectPtr<AActor> TargetedEnemy;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> TowerAttributes;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> TowerAbility;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly)
 	FTowerInformation TowerInfo;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Level")

@@ -13,8 +13,8 @@ UCLASS()
 class TOWERDEFENCE_API ATowerPlacementPlatform : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ATowerPlacementPlatform();
 
@@ -22,17 +22,17 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void SpawnTowerOnPlatform(TSubclassOf<AMasterTower> Tower);
-	
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	TObjectPtr<UStaticMeshComponent> Platform;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Point")
 	TObjectPtr<UBoxComponent> SpawnPoint;
-	
+
 };
