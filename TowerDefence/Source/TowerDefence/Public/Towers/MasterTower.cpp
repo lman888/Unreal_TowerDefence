@@ -138,14 +138,21 @@ void AMasterTower::InitializeAttributes() const
 	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*TowerAttribute.Data.Get());
 }
 
-void AMasterTower::AddTowerAbility(TSubclassOf<UGameplayAbility>& Ability) const
+void AMasterTower::ClientAddTowerAbility_Implementation(TSubclassOf<UGameplayAbility> Ability)
+{
+	TowerAbility = Ability;
+}
+
+void AMasterTower::AddTowerAbility_Implementation(TSubclassOf<UGameplayAbility> Ability)
 {
 	if (Ability == nullptr)
 	{
 		return;
 	}
 
-	AbilitySystemComponent->AddCharacterAbility(Ability);
+	TowerAbility = Ability;
+
+	AbilitySystemComponent->AddCharacterAbility(TowerAbility);
 }
 
 void AMasterTower::UpdateTowerUpgradeWidgetInformation_Implementation()
@@ -192,6 +199,11 @@ void AMasterTower::OnRep_TowerUpdateInfo()
 	UE_LOG(LogTemp, Display, TEXT("Tower Damage is: %d"), TowerInfo.TowerDamage);
 
 	OnDamageChanged.Broadcast(TowerInfo.TowerDamage);
+}
+
+void AMasterTower::OnRep_AddTowerAbility()
+{
+	ClientAddTowerAbility_Implementation(TowerAbility);
 }
 
 void AMasterTower::SetTowerHeadMaterial_Implementation()

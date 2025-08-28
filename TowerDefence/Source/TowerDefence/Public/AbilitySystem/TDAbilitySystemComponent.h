@@ -16,7 +16,7 @@ class TOWERDEFENCE_API UTDAbilitySystemComponent : public UAbilitySystemComponen
 	GENERATED_BODY()
 
 public:
-	void AddCharacterAbility(TSubclassOf<UGameplayAbility>& Ability);
+	void AddCharacterAbility(TSubclassOf<UGameplayAbility> Ability);
 
-	void UpgradeAbility(TSubclassOf<UGameplayAbility>& Ability) const;
+	void UpgradeAbility(TSubclassOf<UGameplayAbility> Ability) const;
 };

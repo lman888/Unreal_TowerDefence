@@ -82,7 +82,11 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void InitializeAttributes() const;
 
-	void AddTowerAbility(TSubclassOf<UGameplayAbility>& Ability) const;
+	UFUNCTION(Server, Reliable)
+	void AddTowerAbility(TSubclassOf<UGameplayAbility> Ability);
+
+	UFUNCTION(Client, Reliable)
+	void ClientAddTowerAbility(TSubclassOf<UGameplayAbility> Ability);
 
 	UFUNCTION(Server, Reliable)
 	void UpdateTowerUpgradeWidgetInformation();
@@ -118,7 +122,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> TowerAttributes;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = "Abilities")
+	UPROPERTY(ReplicatedUsing=OnRep_AddTowerAbility, EditAnywhere, BlueprintReadOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> TowerAbility;
 
 	UPROPERTY(ReplicatedUsing=OnRep_TowerUpdateInfo, EditDefaultsOnly, BlueprintReadOnly)
@@ -141,6 +145,9 @@ protected:
 
 	UFUNCTION()
 	void OnRep_TowerUpdateInfo();
+
+	UFUNCTION()
+	void OnRep_AddTowerAbility();
 	
 	UFUNCTION(Server, Reliable)
 	void SetTowerHeadMaterial();

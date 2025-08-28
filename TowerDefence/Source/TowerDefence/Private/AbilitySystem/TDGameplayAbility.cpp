@@ -12,7 +12,7 @@
 
 UTDGameplayAbility::UTDGameplayAbility()
 {
-
+	
 }
 
 void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -25,6 +25,7 @@ void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	
 	if (!HasAuthority(&ActivationInfo))
 	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 

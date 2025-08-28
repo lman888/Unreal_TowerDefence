@@ -78,12 +78,15 @@ protected:
 	TSubclassOf<UGameplayAbility> DamageAbility;
 
 private:
+
+	UFUNCTION(Server, Reliable)
+	void AddAbility();
+	
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAttributeSet> AttributeSet;
-	
 	
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UNiagaraSystem* DeathEffect;

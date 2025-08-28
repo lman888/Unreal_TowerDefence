@@ -17,6 +17,8 @@ AEnemyCharacter::AEnemyCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	bReplicates = true;
+
 	AbilitySystemComponent = CreateDefaultSubobject<UTDAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
@@ -32,10 +34,10 @@ void AEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	InitializeAttributes();
-
-	AbilitySystemComponent->AddCharacterAbility(DamageAbility);
-
-	GetCharacterMovement()->MaxWalkSpeed =  AttributeSet->GetMovementSpeed();
+	
+	AddAbility();
+	
+	GetCharacterMovement()->MaxWalkSpeed = AttributeSet->GetMovementSpeed();
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddLambda(
 	[this](const FOnAttributeChangeData& Data)
@@ -112,4 +114,12 @@ void AEnemyCharacter::HandleDeath()
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathEffect, GetActorLocation(), GetActorRotation());
 	
 	Destroy();
+}
+
+void AEnemyCharacter::AddAbility_Implementation()
+{
+	if (HasAuthority())
+	{
+		AbilitySystemComponent->AddCharacterAbility(DamageAbility);
+	}
 }

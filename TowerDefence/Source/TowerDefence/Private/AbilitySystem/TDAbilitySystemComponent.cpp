@@ -7,7 +7,7 @@
 #include "Towers/MasterTower.h"
 #include "Enemies/EnemyCharacter.h"
 
-void UTDAbilitySystemComponent::AddCharacterAbility(TSubclassOf<UGameplayAbility>& Ability)
+void UTDAbilitySystemComponent::AddCharacterAbility(TSubclassOf<UGameplayAbility> Ability)
 {
 	//Do this a better way in future
 
@@ -31,7 +31,7 @@ void UTDAbilitySystemComponent::AddCharacterAbility(TSubclassOf<UGameplayAbility
 	UE_LOG(LogTemp, Display, TEXT("Owner is invalid!"));
 }
 
-void UTDAbilitySystemComponent::UpgradeAbility(TSubclassOf<UGameplayAbility>& Ability) const
+void UTDAbilitySystemComponent::UpgradeAbility(TSubclassOf<UGameplayAbility> Ability) const
 {
 	AMasterTower* Owner = Cast<AMasterTower>(GetAvatarActor());
 	if (Owner == nullptr)
