@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "TowerPlacementPlatform.generated.h"
 
+class ATDPlayerPawn;
 class UBoxComponent;
 class AMasterTower;
 
@@ -26,7 +27,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SpawnTowerOnPlatform(TSubclassOf<AMasterTower> Tower);
+	void SpawnTowerOnPlatform(AActor* OwningPlayer, TSubclassOf<AMasterTower> Tower);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")

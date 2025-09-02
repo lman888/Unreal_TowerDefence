@@ -55,6 +55,6 @@ void ATDPlayerPawn::Server_SpawnTower_Implementation(ATowerPlacementPlatform* Pl
 {
 	if (Platform)
 	{
-		Platform->SpawnTowerOnPlatform(Tower);
+		Platform->SpawnTowerOnPlatform(GetOwner(), Tower);
 	}
 }

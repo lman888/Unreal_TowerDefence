@@ -38,26 +38,29 @@ void ATowerPlacementPlatform::Tick(float DeltaTime)
 }
 
 
-void ATowerPlacementPlatform::SpawnTowerOnPlatform(TSubclassOf<AMasterTower> Tower)
+void ATowerPlacementPlatform::SpawnTowerOnPlatform(AActor* OwningPlayer, TSubclassOf<AMasterTower> Tower)
 {
-	if (!IsValid(Tower))
-	{
-		UE_LOG(LogTemp, Display, TEXT("Tower Object is not Valid."));
-		return;
-	}
-
-	const AMasterTower* DefaultTower = Tower->GetDefaultObject<AMasterTower>();
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-
-	FTransform SpawnTransform;
-	SpawnTransform.SetLocation(SpawnPoint->GetComponentLocation());
-	SpawnTransform.SetRotation(DefaultTower->GetActorQuat());
-	SpawnTransform.SetScale3D(DefaultTower->GetActorScale3D());
-
 	if (HasAuthority())
 	{
-		GetWorld()->SpawnActor<AMasterTower>(Tower, SpawnTransform, SpawnParams);
+		if (!IsValid(Tower))
+		{
+			UE_LOG(LogTemp, Display, TEXT("Tower Object is not Valid."));
+			return;
+		}
+
+		const AMasterTower* DefaultTower = Tower->GetDefaultObject<AMasterTower>();
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = OwningPlayer;
+
+		FTransform SpawnTransform;
+		SpawnTransform.SetLocation(SpawnPoint->GetComponentLocation());
+		SpawnTransform.SetRotation(DefaultTower->GetActorQuat());
+		SpawnTransform.SetScale3D(DefaultTower->GetActorScale3D());
+
+		if (HasAuthority())
+		{
+			GetWorld()->SpawnActor<AMasterTower>(Tower, SpawnTransform, SpawnParams);
+		}
 	}
 }
