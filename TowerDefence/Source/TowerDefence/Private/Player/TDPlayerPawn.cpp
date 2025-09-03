@@ -3,6 +3,7 @@
 #include "Player/TDPlayerPawn.h"
 
 #include "Interaction/InteractionComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Platforms/TowerPlacementPlatform.h"
 
 // Sets default values

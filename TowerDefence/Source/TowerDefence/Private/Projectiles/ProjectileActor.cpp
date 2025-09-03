@@ -58,24 +58,24 @@ void AProjectileActor::BeginPlay()
 void AProjectileActor::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor == Cast<AEnemyCharacter>(OtherActor))
+	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Projectile has hit %s"), *OtherActor->GetName());
-		
-		//Cause Damage Here
-		if (ImpactEffect == nullptr)
+		if (OtherActor == Cast<AEnemyCharacter>(OtherActor))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Impact Effect is null in: %s"), *GetName());
-			return;
-		}
-		if (DamageEffectSpecHandle == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Damage Effect is not set in: %s"), *GetName());
-			return;
-		}
-
-		if (HasAuthority())
-		{
+			UE_LOG(LogTemp, Warning, TEXT("Projectile has hit %s"), *OtherActor->GetName());
+			
+			//Cause Damage Here
+			if (ImpactEffect == nullptr)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Impact Effect is null in: %s"), *GetName());
+				return;
+			}
+			if (DamageEffectSpecHandle == nullptr)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Damage Effect is not set in: %s"), *GetName());
+				return;
+			}
+			
 			if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 			{
 				TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());

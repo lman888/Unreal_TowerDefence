@@ -79,7 +79,7 @@ protected:
 
 private:
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void AddAbility();
 	
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
