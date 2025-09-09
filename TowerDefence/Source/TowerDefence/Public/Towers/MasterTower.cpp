@@ -111,7 +111,7 @@ void AMasterTower::UpgradeTower_Implementation()
 	if (HasAuthority())
 	{
 		//Change out Tower Mesh here
-		SetTowerHeadMaterial();
+		ServerSetTowerHeadMaterial();
 
 		if (TowerLevel == MaxTowerLevel)
 		{
@@ -174,6 +174,11 @@ void AMasterTower::UpdateTowerUpgradeWidgetInformation_Implementation()
 	TowerInfo.TowerDamage = Ability->Damage.GetValueAtLevel(Spec->Level);
 }
 
+void AMasterTower::ClientSetTowerHeadMaterial_Implementation(UMaterialInterface* NewMaterial)
+{
+	TowerHead->SetMaterial(0, NewMaterial);
+}
+
 void AMasterTower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -181,6 +186,7 @@ void AMasterTower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(AMasterTower, TowerInfo);
 	DOREPLIFETIME(AMasterTower, TowerAbility);
 	DOREPLIFETIME(AMasterTower, TowerLevel);
+	DOREPLIFETIME(AMasterTower, TowerMaterial);
 }
 
 FTowerInformation AMasterTower::GetTowerInfo()
@@ -190,7 +196,7 @@ FTowerInformation AMasterTower::GetTowerInfo()
 
 void AMasterTower::OnRep_TowerLevelUp()
 {
-	SetTowerHeadMaterial();
+	ClientSetTowerHeadMaterial(TowerMaterial);
 }
 
 void AMasterTower::OnRep_TowerUpdateInfo()
@@ -206,12 +212,12 @@ void AMasterTower::OnRep_AddTowerAbility()
 	ClientAddTowerAbility_Implementation(TowerAbility);
 }
 
-void AMasterTower::SetTowerHeadMaterial_Implementation()
+void AMasterTower::ServerSetTowerHeadMaterial_Implementation()
 {
 	int32 TowerMeshIndex = TowerLevel - 1;
 
 	if (TowerUpgradeMaterial.IsValidIndex(TowerMeshIndex))
 	{
-		TowerHead->SetMaterial(0, TowerUpgradeMaterial[TowerMeshIndex]);
+		TowerMaterial = TowerUpgradeMaterial[TowerMeshIndex];
 	}
 }

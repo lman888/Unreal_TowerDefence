@@ -88,11 +88,17 @@ private:
 	UFUNCTION(Client, Reliable)
 	void ClientAddTowerAbility(TSubclassOf<UGameplayAbility> Ability);
 
+	UFUNCTION(Client, Reliable)
+	void ClientSetTowerHeadMaterial(UMaterialInterface* NewMaterial);
+
 	UFUNCTION(Server, Reliable)
 	void UpdateTowerUpgradeWidgetInformation();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UPROPERTY(ReplicatedUsing=OnRep_TowerLevelUp)
+	UMaterialInterface* TowerMaterial = nullptr;
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Mesh")
 	TObjectPtr<UStaticMeshComponent> TowerBase;
@@ -150,5 +156,5 @@ protected:
 	void OnRep_AddTowerAbility();
 	
 	UFUNCTION(Server, Reliable)
-	void SetTowerHeadMaterial();
+	void ServerSetTowerHeadMaterial();
 };
