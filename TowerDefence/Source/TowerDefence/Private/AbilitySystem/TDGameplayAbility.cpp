@@ -69,6 +69,8 @@ void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 		
 		Projectile->FinishSpawning(SpawnTransform);
+
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 	}
 }
 

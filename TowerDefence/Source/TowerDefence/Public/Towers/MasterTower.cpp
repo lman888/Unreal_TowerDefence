@@ -62,7 +62,7 @@ UAttributeSet* AMasterTower::GetAttributeSet() const
 void AMasterTower::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	AddTowerAbility(TowerAbility);
 
 	UpdateTowerUpgradeWidgetInformation();
@@ -106,10 +106,42 @@ FTransform AMasterTower::GetProjectileSpawnLocation()
 	return ProjectileTransform->GetComponentTransform();
 }
 
+void AMasterTower::LocalUpgradeTower()
+{
+	LocalSetTowerHeadMesh();
+
+	if (TowerLevel == MaxTowerLevel)
+	{
+		return;
+	}
+
+	TowerLevel++;
+
+	AbilitySystemComponent->UpgradeAbility(TowerAbility);
+
+	UpdateTowerUpgradeWidgetInformation();
+}
+
+void AMasterTower::LocalSetTowerHeadMesh()
+{
+	int32 TowerMeshIndex = TowerLevel - 1;
+
+	if (TowerUpgradeMaterial.IsValidIndex(TowerMeshIndex))
+	{
+		TowerMaterial = TowerUpgradeMaterial[TowerMeshIndex];
+	}
+}
+
 void AMasterTower::UpgradeTower_Implementation()
 {
 	if (HasAuthority())
 	{
+		if (GetNetMode() == NM_Standalone)
+		{
+			HandleLocalTowerUpgrade();
+			return;
+		}
+
 		//Change out Tower Mesh here
 		ServerSetTowerHeadMaterial();
 
@@ -123,6 +155,7 @@ void AMasterTower::UpgradeTower_Implementation()
 		AbilitySystemComponent->UpgradeAbility(TowerAbility);
 
 		UpdateTowerUpgradeWidgetInformation();
+
 	}
 }
 
@@ -136,6 +169,29 @@ void AMasterTower::InitializeAttributes() const
 
 	const FGameplayEffectSpecHandle TowerAttribute = AbilitySystemComponent->MakeOutgoingSpec(TowerAttributes, GetTowerLevel(), AbilitySystemComponent->MakeEffectContext());
 	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*TowerAttribute.Data.Get());
+}
+
+void AMasterTower::HandleLocalTowerUpgrade()
+{
+	int32 TowerMeshIndex = TowerLevel - 1;
+
+	if (TowerUpgradeMaterial.IsValidIndex(TowerMeshIndex))
+	{
+		TowerMaterial = TowerUpgradeMaterial[TowerMeshIndex];
+	}
+
+	ClientSetTowerHeadMaterial(TowerMaterial);
+
+	if (TowerLevel == MaxTowerLevel)
+	{
+		return;
+	}
+
+	TowerLevel++;
+
+	AbilitySystemComponent->UpgradeAbility(TowerAbility);
+
+	UpdateTowerUpgradeWidgetInformation();
 }
 
 void AMasterTower::ClientAddTowerAbility_Implementation(TSubclassOf<UGameplayAbility> Ability)

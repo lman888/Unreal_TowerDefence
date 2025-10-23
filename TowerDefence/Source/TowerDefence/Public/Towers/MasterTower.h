@@ -76,11 +76,19 @@ protected:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void UpgradeTower();
 
+	UFUNCTION(BlueprintCallable)
+	void LocalUpgradeTower();
+
+	UFUNCTION()
+	void LocalSetTowerHeadMesh();
+
 private:
 
 	//This is getting called in BeginPlay. I am not sure why it says "No blueprint usages".
 	UFUNCTION(BlueprintCallable)
 	void InitializeAttributes() const;
+
+	void HandleLocalTowerUpgrade();
 
 	UFUNCTION(Server, Reliable)
 	void AddTowerAbility(TSubclassOf<UGameplayAbility> Ability);
@@ -96,9 +104,9 @@ private:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(ReplicatedUsing=OnRep_TowerLevelUp)
+	UPROPERTY(ReplicatedUsing = OnRep_TowerLevelUp)
 	UMaterialInterface* TowerMaterial = nullptr;
-	
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Mesh")
 	TObjectPtr<UStaticMeshComponent> TowerBase;
@@ -128,13 +136,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> TowerAttributes;
 
-	UPROPERTY(ReplicatedUsing=OnRep_AddTowerAbility, EditAnywhere, BlueprintReadOnly, Category = "Abilities")
+	UPROPERTY(ReplicatedUsing = OnRep_AddTowerAbility, EditAnywhere, BlueprintReadOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> TowerAbility;
 
-	UPROPERTY(ReplicatedUsing=OnRep_TowerUpdateInfo, EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(ReplicatedUsing = OnRep_TowerUpdateInfo, EditDefaultsOnly, BlueprintReadOnly)
 	FTowerInformation TowerInfo;
-	
-	UPROPERTY(ReplicatedUsing=OnRep_TowerLevelUp, EditDefaultsOnly, Category = "Level")
+
+	UPROPERTY(ReplicatedUsing = OnRep_TowerLevelUp, EditDefaultsOnly, Category = "Level")
 	int TowerLevel;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Level")
@@ -142,10 +150,10 @@ protected:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnDamageChanged OnDamageChanged;
-	
+
 	UFUNCTION(BlueprintPure)
 	FTowerInformation GetTowerInfo();
-	
+
 	UFUNCTION()
 	void OnRep_TowerLevelUp();
 
@@ -154,7 +162,7 @@ protected:
 
 	UFUNCTION()
 	void OnRep_AddTowerAbility();
-	
+
 	UFUNCTION(Server, Reliable)
 	void ServerSetTowerHeadMaterial();
 };
