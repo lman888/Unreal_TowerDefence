@@ -3,7 +3,6 @@
 
 #include "Platforms/TowerPlacementPlatform.h"
 
-#include "IAutomationControllerManager.h"
 #include "Components/BoxComponent.h"
 #include "Towers/MasterTower.h"
 #include "Kismet/GameplayStatics.h"
