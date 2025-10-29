@@ -8,7 +8,7 @@ public class TowerDefence : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "GameplayAbilities", "Niagara" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "GameplayAbilities", "Niagara", "OnlineSubsystem" });
 
         PrivateDependencyModuleNames.AddRange(new string[] { "GameplayTags", "GameplayTasks", "OnlineSubsystem", "OnlineSubsystemEOS" });
 
