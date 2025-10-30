@@ -7,11 +7,15 @@
 #include "TDGameMode.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class TOWERDEFENCE_API ATDGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	ATDGameMode();
+
+
 };
