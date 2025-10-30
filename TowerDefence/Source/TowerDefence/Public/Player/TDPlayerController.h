@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "TDPlayerController.generated.h"
+
+class FOnlineSessionSearch;
+class FOnlineSessionSearchResult;
 
 /**
  *
@@ -23,6 +27,20 @@ protected:
 	void Login();
 
 	void HandleLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserID, const FString& Error);
-
+	
+	void FindSessions(FName SearchKey = "KeyName", FString SearchValue = "KeyValue");
+	
+	void HandleFindSessionsCompleted(bool bWasSuccessful, TSharedRef<FOnlineSessionSearch> Search);
+	
+	void JoinSession();
+	
+	void HandleJoinSessionCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	
+	FDelegateHandle FindSessionsDelegateHandle;
+	
+	FString ConnectString;
+	
+	FOnlineSessionSearchResult* SessionToJoin; 
+	FDelegateHandle JoinSessionDelegateHandle;
 	FDelegateHandle LoginDelegateHandle;
 };

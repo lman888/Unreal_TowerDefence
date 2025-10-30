@@ -1,0 +1,1 @@
+"E:\EpicGames\UE_5.6\Engine\Binaries\Win64\UnrealEditor.exe" "F:\Repos\Unreal_Game\Unreal_TowerDefence\TowerDefence\TowerDefence.uproject" Map01 -server -log -epicapp="Server"

@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Interfaces/OnlineSessionInterface.h"
-#include "GameFramework/GameSession.h"
 #include "EOSGameInstance.generated.h"
 
 class IOnlineSubsystem;
