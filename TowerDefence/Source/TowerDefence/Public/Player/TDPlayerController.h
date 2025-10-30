@@ -7,7 +7,7 @@
 #include "TDPlayerController.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class TOWERDEFENCE_API ATDPlayerController : public APlayerController
@@ -16,5 +16,13 @@ class TOWERDEFENCE_API ATDPlayerController : public APlayerController
 
 public:
 	ATDPlayerController();
-	
+
+protected:
+	virtual void BeginPlay();
+
+	void Login();
+
+	void HandleLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserID, const FString& Error);
+
+	FDelegateHandle LoginDelegateHandle;
 };
