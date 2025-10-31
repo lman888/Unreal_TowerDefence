@@ -9,6 +9,8 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
 #include "OnlineSubsystemTypes.h"
+#include "Online/OnlineSessionNames.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 
 
@@ -107,6 +109,116 @@ void ATDPlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWasSucc
 	LoginDelegateHandle.Reset();
 }
 
+void ATDPlayerController::CreateLobby(FName KeyName, FString KeyValue)
+{
+	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
+	if (Subsystem == nullptr)
+	{
+		return;
+	}
+
+	IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
+	if (Session == nullptr)
+	{
+		return;
+	}
+
+	CreateLobbyDelegateHandle = Session->AddOnCreateSessionCompleteDelegate_Handle(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ATDPlayerController::HandleCreateLobbyCompleted));
+
+	TSharedRef<FOnlineSessionSettings> SessionSettings = MakeShared<FOnlineSessionSettings>();
+	SessionSettings->NumPublicConnections = 2;
+	SessionSettings->bShouldAdvertise = true; //This creates a public match and will be searchable.
+	SessionSettings->bUsesPresence = false;   //No presence on dedicated server. This requires a local user.
+	SessionSettings->bAllowJoinViaPresence = false;
+	SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
+	SessionSettings->bAllowInvites = false;    //Allow inviting players into session. This requires presence and a local user. 
+	SessionSettings->bAllowJoinInProgress = false; //Once the session is started, no one can join.
+	SessionSettings->bIsDedicated = false; //Session created on dedicated server.
+	SessionSettings->bUseLobbiesIfAvailable = true; //For P2P we will use a lobby instead of a session
+	SessionSettings->bUseLobbiesVoiceChatIfAvailable = true; //We will also enable voice
+	SessionSettings->bUsesStats = true; //Needed to keep track of player stats.
+
+	SessionSettings->Settings.Add(KeyName, FOnlineSessionSetting((KeyValue), EOnlineDataAdvertisementType::ViaOnlineService));
+
+	UE_LOG(LogTemp, Log, TEXT("Creating Lobby..."));
+
+	if (Session->CreateSession(0, LobbyName, *SessionSettings) == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to create Lobby!"));
+	}
+}
+
+void ATDPlayerController::HandleCreateLobbyCompleted(FName EOSLobbyName, bool bWasSuccessful)
+{
+	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
+	if (Subsystem == nullptr)
+	{
+		return;
+	}
+
+	IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
+	if (Session == nullptr)
+	{
+		return;
+	}
+
+	if (bWasSuccessful == true)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Lobby: %s Created!"), *EOSLobbyName.ToString());
+		FString Map = "/Game/Levels/Map01?listen"; //Hardcoding map name here, should be passed by parameter
+		FURL TravelURL;
+		TravelURL.Map = Map;
+		//GetWorld()->Listen(TravelURL);
+		GetWorld()->ServerTravel(Map, TRAVEL_Absolute);
+
+		SetupNotifications();
+	}
+
+
+	if (bWasSuccessful == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to create lobby!"));
+	}
+
+	Session->ClearOnCreateSessionCompleteDelegate_Handle(CreateLobbyDelegateHandle);
+	CreateLobbyDelegateHandle.Reset();
+}
+
+void ATDPlayerController::SetupNotifications()
+{
+	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
+	if (Subsystem == nullptr)
+	{
+		return;
+	}
+
+	IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
+	if (Session == nullptr)
+	{
+		return;
+	}
+
+	Session->AddOnSessionParticipantJoinedDelegate_Handle(FOnSessionParticipantJoinedDelegate::CreateUObject(this, &ThisClass::HandleParticipantJoined));
+
+}
+
+void ATDPlayerController::HandleParticipantJoined(FName EOSLobbyName, const FUniqueNetId& NetId)
+{
+	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
+	if (Subsystem == nullptr)
+	{
+		return;
+	}
+
+	IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
+	if (Session == nullptr)
+	{
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Player Joined Lobby."));
+}
+
 void ATDPlayerController::FindSessions(FName SearchKey, FString SearchValue)
 {
 	IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld());
@@ -114,22 +226,35 @@ void ATDPlayerController::FindSessions(FName SearchKey, FString SearchValue)
 	{
 		return;
 	}
-	
+
 	IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
 	if (Session == nullptr)
 	{
 		return;
 	}
-	
+
 	TSharedRef<FOnlineSessionSearch> Search = MakeShared<FOnlineSessionSearch>();
 
 	Search->QuerySettings.SearchParams.Empty();
 
+
 	Search->QuerySettings.Set(SearchKey, SearchValue, EOnlineComparisonOp::Equals);
+
+#if P2PMODE
+
+	Search->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
+
+#endif
+
 	FindSessionsDelegateHandle = Session->AddOnFindSessionsCompleteDelegate_Handle(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ATDPlayerController::HandleFindSessionsCompleted, Search));
 
+#if P2PMODE
+	UE_LOG(LogTemp, Log, TEXT("Finding lobby."));
+#else 
 	UE_LOG(LogTemp, Log, TEXT("Finding session."));
- 
+#endif
+
+
 	if (Session->FindSessions(0, Search) == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Find session failed"));
@@ -143,7 +268,7 @@ void ATDPlayerController::HandleFindSessionsCompleted(bool bWasSuccessful, TShar
 	{
 		return;
 	}
-	
+
 	IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
 	if (Session == nullptr)
 	{
@@ -157,17 +282,36 @@ void ATDPlayerController::HandleFindSessionsCompleted(bool bWasSuccessful, TShar
 
 	if (bWasSuccessful == true)
 	{
+
+		if (Search->SearchResults.Num() == 0)
+		{
+#if P2PMODE
+			CreateLobby();
+#endif
+		}
+#if P2PMODE
+		UE_LOG(LogTemp, Log, TEXT("Found lobby."));
+#else 
+		UE_LOG(LogTemp, Warning, TEXT("Found session."));
+#endif 
+
 		for (FOnlineSessionSearchResult SessionInSearchResult : Search->SearchResults)
 		{
 			if (Session->GetResolvedConnectString(SessionInSearchResult, NAME_GamePort, ConnectString))
 			{
-				SessionToJoin = &SessionInSearchResult; 
+				SessionToJoin = &SessionInSearchResult;
 			}
 
 			//Break after finding the first session for this example
 			break;
 		}
 	}
+
+#if P2PMODE
+	UE_LOG(LogTemp, Log, TEXT("Find lobby failed."));
+#else 
+	UE_LOG(LogTemp, Warning, TEXT("Find session failed."));
+#endif 
 
 	Session->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionsDelegateHandle);
 	FindSessionsDelegateHandle.Reset();
@@ -180,7 +324,7 @@ void ATDPlayerController::JoinSession()
 	{
 		return;
 	}
-	
+
 	IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
 	if (Session == nullptr)
 	{
@@ -189,12 +333,23 @@ void ATDPlayerController::JoinSession()
 
 	JoinSessionDelegateHandle = Session->AddOnJoinSessionCompleteDelegate_Handle(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::HandleJoinSessionCompleted));
 
+#if P2PMODE
+	UE_LOG(LogTemp, Log, TEXT("Joining Lobby."));
+#else 
 	UE_LOG(LogTemp, Log, TEXT("Joining session."));
-	
+#endif 
+
 	if (Session->JoinSession(0, "SessionName", *SessionToJoin) == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Join session failed"));
-	} 
+#if P2PMODE
+		UE_LOG(LogTemp, Log, TEXT("Join Lobby failed."));
+#else 
+		UE_LOG(LogTemp, Log, TEXT("Join session failed."));
+#endif
+
+		Session->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionDelegateHandle);
+		JoinSessionDelegateHandle.Reset();
+	}
 }
 
 void ATDPlayerController::HandleJoinSessionCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
@@ -204,13 +359,21 @@ void ATDPlayerController::HandleJoinSessionCompleted(FName SessionName, EOnJoinS
 	{
 		return;
 	}
-	
+
 	IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
 	if (Session == nullptr)
 	{
 		return;
 	}
 
+#if P2PMODE
+	if (Result == EOnJoinSessionCompleteResult::Success)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Joined lobby."));
+		ClientTravel(ConnectString, TRAVEL_Absolute);
+		SetupNotifications(); // Setup our listeners for lobby event notifications
+	}
+#else
 	if (Result == EOnJoinSessionCompleteResult::Success)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Joined Session!"));
@@ -226,10 +389,11 @@ void ATDPlayerController::HandleJoinSessionCompleted(FName SessionName, EOnJoinS
 
 			if (DedicatedServerJoinStatus == EBrowseReturnVal::Failure)
 			{
-				UE_LOG(LogTemp, Error, TEXT("Failed to browse for dedicated server. Error is: %s"), *DedicatedServerJoinError); 
+				UE_LOG(LogTemp, Error, TEXT("Failed to browse for dedicated server. Error is: %s"), *DedicatedServerJoinError);
 			}
 		}
 	}
+#endif
 
 	Session->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionDelegateHandle);
 	JoinSessionDelegateHandle.Reset();

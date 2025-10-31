@@ -27,20 +27,31 @@ protected:
 	void Login();
 
 	void HandleLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserID, const FString& Error);
-	
+
+	void CreateLobby(FName KeyName = "KeyName", FString KeyValue = "KeyValue");
+
+	void HandleCreateLobbyCompleted(FName EOSLobbyName, bool bWasSuccessful);
+
+	void SetupNotifications();
+
+	void HandleParticipantJoined(FName EOSLobbyName, const FUniqueNetId& NetId);
+
 	void FindSessions(FName SearchKey = "KeyName", FString SearchValue = "KeyValue");
-	
+
 	void HandleFindSessionsCompleted(bool bWasSuccessful, TSharedRef<FOnlineSessionSearch> Search);
-	
+
 	void JoinSession();
-	
+
 	void HandleJoinSessionCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
-	
+
 	FDelegateHandle FindSessionsDelegateHandle;
-	
+
 	FString ConnectString;
-	
-	FOnlineSessionSearchResult* SessionToJoin; 
+
+	FName LobbyName = "TD Game";
+
+	FOnlineSessionSearchResult* SessionToJoin;
 	FDelegateHandle JoinSessionDelegateHandle;
 	FDelegateHandle LoginDelegateHandle;
+	FDelegateHandle CreateLobbyDelegateHandle;
 };

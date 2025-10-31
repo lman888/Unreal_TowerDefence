@@ -6,5 +6,8 @@
 
 ATDGameMode::ATDGameMode()
 {
+
+#if !P2PMODE
 	GameSessionClass = ATDEOSGameSession::StaticClass();
+#endif
 }

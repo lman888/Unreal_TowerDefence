@@ -12,6 +12,9 @@ public class TowerDefence : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(new string[] { "GameplayTags", "GameplayTasks", "OnlineSubsystemEOS", "OnlineSubsystemEOSPlus" });
 
+        //Sets our game to run in P2P mode instead of Dedicated Server which for the TD game is fine
+        PrivateDefinitions.Add("P2PMODE=1");
+
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
