@@ -102,7 +102,7 @@ void ATDPlayerController::HandleLoginCompleted(int32 LocalUserNum, bool bWasSucc
 	if (bWasSuccessful == true)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("EOS login completed."));
-		FindSessions();
+		FindSessions("KEYVALUE", "TDGame1");
 	}
 
 	Identity->ClearOnLoginCompleteDelegate_Handle(LocalUserNum, LoginDelegateHandle);
@@ -128,7 +128,7 @@ void ATDPlayerController::CreateLobby(FName KeyName, FString KeyValue)
 	TSharedRef<FOnlineSessionSettings> SessionSettings = MakeShared<FOnlineSessionSettings>();
 	SessionSettings->NumPublicConnections = 2;
 	SessionSettings->bShouldAdvertise = true; //This creates a public match and will be searchable.
-	SessionSettings->bUsesPresence = false;   //No presence on dedicated server. This requires a local user.
+	SessionSettings->bUsesPresence = true;   //No presence on dedicated server. This requires a local user.
 	SessionSettings->bAllowJoinViaPresence = false;
 	SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
 	SessionSettings->bAllowInvites = false;    //Allow inviting players into session. This requires presence and a local user. 
@@ -165,6 +165,9 @@ void ATDPlayerController::HandleCreateLobbyCompleted(FName EOSLobbyName, bool bW
 	if (bWasSuccessful == true)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Lobby: %s Created!"), *EOSLobbyName.ToString());
+
+		Session->StartSession(EOSLobbyName);
+
 		FString Map = "/Game/Levels/Map01?listen"; //Hardcoding map name here, should be passed by parameter
 		FURL TravelURL;
 		TravelURL.Map = Map;
@@ -277,7 +280,11 @@ void ATDPlayerController::HandleFindSessionsCompleted(bool bWasSuccessful, TShar
 
 	if (bWasSuccessful == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Find Sessions failed."));
+#if P2PMODE
+		UE_LOG(LogTemp, Log, TEXT("Find lobby failed."));
+#else 
+		UE_LOG(LogTemp, Warning, TEXT("Find session failed."));
+#endif 
 	}
 
 	if (bWasSuccessful == true)
@@ -286,8 +293,9 @@ void ATDPlayerController::HandleFindSessionsCompleted(bool bWasSuccessful, TShar
 		if (Search->SearchResults.Num() == 0)
 		{
 #if P2PMODE
-			CreateLobby();
+			CreateLobby("KEYVALUE", "TDGame1");
 #endif
+			return;
 		}
 #if P2PMODE
 		UE_LOG(LogTemp, Log, TEXT("Found lobby."));
@@ -300,18 +308,18 @@ void ATDPlayerController::HandleFindSessionsCompleted(bool bWasSuccessful, TShar
 			if (Session->GetResolvedConnectString(SessionInSearchResult, NAME_GamePort, ConnectString))
 			{
 				SessionToJoin = &SessionInSearchResult;
+				break;
 			}
 
 			//Break after finding the first session for this example
 			break;
 		}
-	}
 
-#if P2PMODE
-	UE_LOG(LogTemp, Log, TEXT("Find lobby failed."));
-#else 
-	UE_LOG(LogTemp, Warning, TEXT("Find session failed."));
-#endif 
+		if (SessionToJoin)
+		{
+			JoinSession();
+		}
+	}
 
 	Session->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionsDelegateHandle);
 	FindSessionsDelegateHandle.Reset();
@@ -339,7 +347,12 @@ void ATDPlayerController::JoinSession()
 	UE_LOG(LogTemp, Log, TEXT("Joining session."));
 #endif 
 
-	if (Session->JoinSession(0, "SessionName", *SessionToJoin) == false)
+	if (SessionToJoin == nullptr)
+	{
+		return;
+	}
+
+	if (Session->JoinSession(0, LobbyName, *SessionToJoin) == false)
 	{
 #if P2PMODE
 		UE_LOG(LogTemp, Log, TEXT("Join Lobby failed."));
@@ -370,8 +383,11 @@ void ATDPlayerController::HandleJoinSessionCompleted(FName SessionName, EOnJoinS
 	if (Result == EOnJoinSessionCompleteResult::Success)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Joined lobby."));
+
+		UE_LOG(LogTemp, Log, TEXT("Connection String: [%s]"), *ConnectString);
 		ClientTravel(ConnectString, TRAVEL_Absolute);
 		SetupNotifications(); // Setup our listeners for lobby event notifications
+
 	}
 #else
 	if (Result == EOnJoinSessionCompleteResult::Success)
