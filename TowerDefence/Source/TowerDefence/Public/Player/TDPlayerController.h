@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "OnlineSessionSettings.h"
 #include "GameFramework/PlayerController.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "TDPlayerController.generated.h"
@@ -28,15 +29,16 @@ protected:
 
 	void HandleLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserID, const FString& Error);
 
-	void CreateLobby(FName KeyName = "KeyName", FString KeyValue = "KeyValue");
-
-	void HandleCreateLobbyCompleted(FName EOSLobbyName, bool bWasSuccessful);
 
 	void SetupNotifications();
 
 	void HandleParticipantJoined(FName EOSLobbyName, const FUniqueNetId& NetId);
 
 	void FindSessions(FName SearchKey = "KeyName", FString SearchValue = "KeyValue");
+	
+	void CreateLobby(FName KeyName = "KeyName", FString KeyValue = "KeyValue");
+
+	void HandleCreateLobbyCompleted(FName EOSLobbyName, bool bWasSuccessful);
 
 	void HandleFindSessionsCompleted(bool bWasSuccessful, TSharedRef<FOnlineSessionSearch> Search);
 
@@ -48,9 +50,9 @@ protected:
 
 	FString ConnectString;
 
-	FName LobbyName = "TD Game";
+	FName LobbyName = "TDGame";
 
-	FOnlineSessionSearchResult* SessionToJoin;
+	TSharedPtr<FOnlineSessionSearchResult> SessionToJoin;
 	FDelegateHandle JoinSessionDelegateHandle;
 	FDelegateHandle LoginDelegateHandle;
 	FDelegateHandle CreateLobbyDelegateHandle;
