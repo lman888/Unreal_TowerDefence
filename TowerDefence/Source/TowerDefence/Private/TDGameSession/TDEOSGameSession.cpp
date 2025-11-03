@@ -20,10 +20,10 @@ void ATDEOSGameSession::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (IsRunningDedicatedServer() && bSessionExists == false)
-	{
-		CreateSession("KeyName", "KeyValue");
-	}
+	// if (IsRunningDedicatedServer() && bSessionExists == false)
+	// {
+	// 	CreateSession("KeyName", "KeyValue");
+	// }
 }
 
 void ATDEOSGameSession::CreateSession(FName KeyName, FString KeyValue)
@@ -95,11 +95,6 @@ void ATDEOSGameSession::HandleCreateSessionCompleted(FName EOSSessionName, bool 
 	
 	Session->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionDelegateHandle);
 	CreateSessionDelegateHandle.Reset();
-}
-
-bool ATDEOSGameSession::ProcessAutoLogin()
-{
-	return Super::ProcessAutoLogin();
 }
 
 void ATDEOSGameSession::RegisterPlayer(APlayerController* NewPlayer, const FUniqueNetIdRepl& UniqueId,

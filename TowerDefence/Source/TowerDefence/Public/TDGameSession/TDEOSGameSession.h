@@ -23,8 +23,6 @@ public:
 
 	void HandleCreateSessionCompleted(FName EOSSessionName, bool bWasSuccessful);
 
-	virtual bool ProcessAutoLogin() override;
-
 	virtual void RegisterPlayer(APlayerController* NewPlayer, const FUniqueNetIdRepl& UniqueId, bool bWasFromInvite) override;
 
 	void HandleRegisterPlayerCompleted(FName EOSSessionName, const TArray<FUniqueNetIdRef>& PlayerIds, bool bWasSuccesful);
