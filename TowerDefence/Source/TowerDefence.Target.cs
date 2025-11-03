@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 public class TowerDefenceTarget : TargetRules
 {
-	public TowerDefenceTarget(TargetInfo Target) : base(Target)
-	{
-		Type = TargetType.Game;
-		DefaultBuildSettings = BuildSettingsVersion.V5;
-		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_5;
-		ExtraModuleNames.Add("TowerDefence");
-	}
+    public TowerDefenceTarget(TargetInfo Target) : base(Target)
+    {
+        Type = TargetType.Game;
+        DefaultBuildSettings = BuildSettingsVersion.V5;
+        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_5;
+        ExtraModuleNames.Add("TowerDefence");
+    }
 }

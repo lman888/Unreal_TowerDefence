@@ -22,7 +22,7 @@ void ATDPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Login();
+	//Login();
 }
 
 void ATDPlayerController::Login()
