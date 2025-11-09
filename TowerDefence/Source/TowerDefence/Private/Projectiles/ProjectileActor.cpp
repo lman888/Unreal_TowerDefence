@@ -61,6 +61,7 @@ void AProjectileActor::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent,
 	if (HasAuthority())
 	{
 		if (OtherActor == Cast<AEnemyCharacter>(OtherActor))
+		if (OtherActor == Cast<AEnemyCharacter>(OtherActor))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Projectile has hit %s"), *OtherActor->GetName());
 			
