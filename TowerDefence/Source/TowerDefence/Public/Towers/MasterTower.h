@@ -76,9 +76,6 @@ protected:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void UpgradeTower();
 
-	UFUNCTION(BlueprintCallable)
-	void LocalUpgradeTower();
-
 	UFUNCTION()
 	void LocalSetTowerHeadMesh();
 
@@ -101,6 +98,9 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void UpdateTowerUpgradeWidgetInformation();
+
+	UFUNCTION()
+	void LocalUpdateTowerUpgradeWidgetInformation();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

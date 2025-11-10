@@ -106,22 +106,6 @@ FTransform AMasterTower::GetProjectileSpawnLocation()
 	return ProjectileTransform->GetComponentTransform();
 }
 
-void AMasterTower::LocalUpgradeTower()
-{
-	LocalSetTowerHeadMesh();
-
-	if (TowerLevel == MaxTowerLevel)
-	{
-		return;
-	}
-
-	TowerLevel++;
-
-	AbilitySystemComponent->UpgradeAbility(TowerAbility);
-
-	UpdateTowerUpgradeWidgetInformation();
-}
-
 void AMasterTower::LocalSetTowerHeadMesh()
 {
 	int32 TowerMeshIndex = TowerLevel - 1;
@@ -152,10 +136,11 @@ void AMasterTower::UpgradeTower_Implementation()
 
 		TowerLevel++;
 
+		ClientSetTowerHeadMaterial(TowerMaterial);
+		
 		AbilitySystemComponent->UpgradeAbility(TowerAbility);
-
+		
 		UpdateTowerUpgradeWidgetInformation();
-
 	}
 }
 
@@ -191,7 +176,7 @@ void AMasterTower::HandleLocalTowerUpgrade()
 
 	AbilitySystemComponent->UpgradeAbility(TowerAbility);
 
-	UpdateTowerUpgradeWidgetInformation();
+	LocalUpdateTowerUpgradeWidgetInformation();
 }
 
 void AMasterTower::ClientAddTowerAbility_Implementation(TSubclassOf<UGameplayAbility> Ability)
@@ -228,11 +213,34 @@ void AMasterTower::UpdateTowerUpgradeWidgetInformation_Implementation()
 	}
 
 	TowerInfo.TowerDamage = Ability->Damage.GetValueAtLevel(Spec->Level);
+
+	OnDamageChanged.Broadcast(TowerInfo.TowerDamage);
 }
 
 void AMasterTower::ClientSetTowerHeadMaterial_Implementation(UMaterialInterface* NewMaterial)
 {
 	TowerHead->SetMaterial(0, NewMaterial);
+}
+
+void AMasterTower::LocalUpdateTowerUpgradeWidgetInformation()
+{
+	UTDGameplayAbility* Ability = Cast<UTDGameplayAbility>(TowerAbility.GetDefaultObject());
+	if (Ability == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ability is no valid!"));
+		return;
+	}
+
+	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromClass(TowerAbility);
+	if (Spec == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spec is no valid!"));
+		return;
+	}
+
+	TowerInfo.TowerDamage = Ability->Damage.GetValueAtLevel(Spec->Level);
+
+	OnDamageChanged.Broadcast(TowerInfo.TowerDamage);
 }
 
 void AMasterTower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
