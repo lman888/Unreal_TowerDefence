@@ -5,6 +5,7 @@
 
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
+#include "Enemies/EnemyCharacter.h"
 #include "Interface/TDCombatInterface.h"
 
 UTDAttributeSet::UTDAttributeSet()
@@ -36,7 +37,7 @@ void UTDAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, fl
 void UTDAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
-
+	
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
@@ -44,7 +45,7 @@ void UTDAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 		UE_LOG(LogTemp, Warning, TEXT("Health from GetHealth(): %f"), GetHealth());
 		UE_LOG(LogTemp, Warning, TEXT("Magnitude: %f"), Data.EvaluatedData.Magnitude);
 	}
-
+	
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
 		const float LocalIncomingDamage = GetIncomingDamage();

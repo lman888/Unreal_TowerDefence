@@ -7,6 +7,7 @@
 #include "Interface/TDCombatInterface.h"
 #include "EnemyCharacter.generated.h"
 
+struct FOnAttributeChangeData;
 class AHomeBase;
 class UGameplayAbility;
 class UWidgetComponent;
@@ -48,6 +49,8 @@ public:
 	void InitializeAttributes() const;
 
 	void ApplyEffectSpec(const TSubclassOf<UGameplayEffect>& GameplayEffect, float Level) const;
+
+	void SetMovementSpeed();
 
 	UFUNCTION(BlueprintPure)
 	UTDAttributeSet* GetAttributeSet() const;

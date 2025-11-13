@@ -6,7 +6,6 @@
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/TDAbilitySystemComponent.h"
 #include "AbilitySystem/TDAttributeSet.h"
-#include "Base/HomeBase.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -51,6 +50,12 @@ void AEnemyCharacter::BeginPlay()
 		OnMaxHealthChanged.Broadcast(Data.NewValue);
 	});
 
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMovementSpeedAttribute()).AddLambda(
+[this](const FOnAttributeChangeData& Data)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = Data.NewValue;
+	});
+
 	OnHealthChanged.Broadcast(AttributeSet->GetHealth());
 	OnMaxHealthChanged.Broadcast(AttributeSet->GetMaxHealth());
 }
@@ -93,6 +98,11 @@ void AEnemyCharacter::ApplyEffectSpec(const TSubclassOf<UGameplayEffect>& Gamepl
 	const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
 	const FGameplayEffectSpecHandle EffectSpec = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffect, 1, ContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpec.Data.Get(), GetAbilitySystemComponent());
+}
+
+void AEnemyCharacter::SetMovementSpeed()
+{
+	GetCharacterMovement()->MaxWalkSpeed = AttributeSet->GetMovementSpeed();
 }
 
 UTDAttributeSet* AEnemyCharacter::GetAttributeSet() const
