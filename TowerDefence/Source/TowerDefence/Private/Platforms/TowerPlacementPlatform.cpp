@@ -48,6 +48,11 @@ void ATowerPlacementPlatform::SpawnTowerOnPlatform(AActor* OwningPlayer, TSubcla
 		}
 
 		const AMasterTower* DefaultTower = Tower->GetDefaultObject<AMasterTower>();
+		if (DefaultTower == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Default Tower is null in : %s"), *GetName());
+			return;
+		}
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = OwningPlayer;
@@ -57,9 +62,8 @@ void ATowerPlacementPlatform::SpawnTowerOnPlatform(AActor* OwningPlayer, TSubcla
 		SpawnTransform.SetRotation(DefaultTower->GetActorQuat());
 		SpawnTransform.SetScale3D(DefaultTower->GetActorScale3D());
 
-		if (HasAuthority())
-		{
-			GetWorld()->SpawnActor<AMasterTower>(Tower, SpawnTransform, SpawnParams);
-		}
+		bIsTowerPlaced = true;
+
+		GetWorld()->SpawnActor<AMasterTower>(Tower, SpawnTransform, SpawnParams);
 	}
 }

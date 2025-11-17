@@ -8,7 +8,7 @@
 
 class AProjectileActor;
 /**
- * 
+ *
  */
 UCLASS()
 class TOWERDEFENCE_API UTDGameplayAbility : public UGameplayAbility
@@ -30,14 +30,18 @@ public:
 	FScalableFloat Damage;
 
 protected:
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AProjectileActor> ProjectileClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly);
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
-	
+
 private:
+
+	void SpawnProjectile(FTransform SpawnTransform);
+
+	void ApplyGameplayEffectSpecToProj(AProjectileActor* Projectile);
 
 	UPROPERTY(EditAnywhere, Category = "Target")
 	TObjectPtr<AActor> ProjectileTarget;

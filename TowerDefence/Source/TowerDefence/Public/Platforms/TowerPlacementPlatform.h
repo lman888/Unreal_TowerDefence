@@ -36,4 +36,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Point")
 	TObjectPtr<UBoxComponent> SpawnPoint;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsTowerPlaced = false;
 };

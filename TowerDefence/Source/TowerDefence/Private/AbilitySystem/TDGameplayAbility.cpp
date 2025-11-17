@@ -12,7 +12,7 @@
 
 UTDGameplayAbility::UTDGameplayAbility()
 {
-	
+
 }
 
 void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -22,7 +22,7 @@ void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
-	
+
 	if (!HasAuthority(&ActivationInfo))
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
@@ -39,36 +39,17 @@ void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 		newRotation.Yaw += 90.0f;
 
 		SpawnTransform.SetRotation(newRotation.Quaternion());
-		
-		AProjectileActor* Projectile = GetWorld()->SpawnActorDeferred<AProjectileActor>(ProjectileClass, SpawnTransform, GetOwningActorFromActorInfo(),
-											     Cast<APawn>(GetOwningActorFromActorInfo()), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-		if (Projectile == nullptr)
+		if (ProjectileClass && DamageEffectClass == nullptr)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Projectile is Invalid inside %s"), *GetName());
+			UE_LOG(LogTemp, Warning, TEXT("No Damage Effect or Projectile Class have been assigned to %s"), *GetName());
 			return;
 		}
-		
-		AMasterTower* Owner = Cast<AMasterTower>(GetAvatarActorFromActorInfo());
-		if (Owner == nullptr)
-		{
-			return;
-		}
-		
-		
-		//Give Projectile a Gameplay Effect Spec for causing Damage
-		const UTDAbilitySystemComponent* SourceASC = Cast<UTDAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo()));
-		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
-		
-		FTDGameplayTags GameplayTags = FTDGameplayTags::Get();
-		const float ScaledDamage = Damage.GetValueAtLevel(SpecHandle.Data.Get()->GetLevel());
 
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Basic Turret Damage: %f"), ScaledDamage));
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
-		
-		Projectile->DamageEffectSpecHandle = SpecHandle;
-		
-		Projectile->FinishSpawning(SpawnTransform);
+		if (ProjectileClass)
+		{
+			SpawnProjectile(SpawnTransform);
+		}
 
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 	}
@@ -82,4 +63,35 @@ void UTDGameplayAbility::SetTarget(AActor* Target)
 AActor* UTDGameplayAbility::GetTarget()
 {
 	return ProjectileTarget;
+}
+
+void UTDGameplayAbility::SpawnProjectile(FTransform SpawnTransform)
+{
+	AProjectileActor* Projectile = GetWorld()->SpawnActorDeferred<AProjectileActor>(ProjectileClass, SpawnTransform, GetOwningActorFromActorInfo(),
+		Cast<APawn>(GetOwningActorFromActorInfo()), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+	if (Projectile == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Projectile is Invalid inside %s"), *GetName());
+		return;
+	}
+
+	ApplyGameplayEffectSpecToProj(Projectile);
+
+	Projectile->FinishSpawning(SpawnTransform);
+}
+
+void UTDGameplayAbility::ApplyGameplayEffectSpecToProj(AProjectileActor* Projectile)
+{
+	//Give Projectile a Gameplay Effect Spec for causing Damage
+	const UTDAbilitySystemComponent* SourceASC = Cast<UTDAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo()));
+	const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+
+	FTDGameplayTags GameplayTags = FTDGameplayTags::Get();
+	const float ScaledDamage = Damage.GetValueAtLevel(SpecHandle.Data.Get()->GetLevel());
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Basic Turret Damage: %f"), ScaledDamage));
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
+
+	Projectile->DamageEffectSpecHandle = SpecHandle;
 }
