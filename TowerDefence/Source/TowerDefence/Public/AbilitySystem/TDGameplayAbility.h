@@ -18,8 +18,6 @@ class TOWERDEFENCE_API UTDGameplayAbility : public UGameplayAbility
 public:
 	UTDGameplayAbility();
 
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-
 	UFUNCTION(BlueprintCallable)
 	void SetTarget(AActor* Target);
 
@@ -30,18 +28,12 @@ public:
 	FScalableFloat Damage;
 
 protected:
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<AProjectileActor> ProjectileClass;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly);
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
 
+	FGameplayEffectSpecHandle GetGameplayEffectSpecHandle();
+
 private:
-
-	void SpawnProjectile(FTransform SpawnTransform);
-
-	void ApplyGameplayEffectSpecToProj(AProjectileActor* Projectile);
 
 	UPROPERTY(EditAnywhere, Category = "Target")
 	TObjectPtr<AActor> ProjectileTarget;

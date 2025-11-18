@@ -3,8 +3,6 @@
 
 #include "AbilitySystem/TDGameplayAbility.h"
 
-#include "Interaction/TowerInterface.h"
-#include "Projectiles/ProjectileActor.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "TDGameplayTags.h"
 #include "AbilitySystem/TDAbilitySystemComponent.h"
@@ -13,46 +11,6 @@
 UTDGameplayAbility::UTDGameplayAbility()
 {
 
-}
-
-void UTDGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	CommitAbility(Handle, ActorInfo, ActivationInfo);
-
-	if (!HasAuthority(&ActivationInfo))
-	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-		return;
-	}
-
-	ITowerInterface* towerInterface = Cast<ITowerInterface>(GetAvatarActorFromActorInfo());
-	if (towerInterface)
-	{
-		FTransform SpawnTransform = towerInterface->GetProjectileSpawnLocation();
-
-		FRotator newRotation = SpawnTransform.Rotator();
-
-		newRotation.Yaw += 90.0f;
-
-		SpawnTransform.SetRotation(newRotation.Quaternion());
-
-		if (ProjectileClass && DamageEffectClass == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No Damage Effect or Projectile Class have been assigned to %s"), *GetName());
-			return;
-		}
-
-		if (ProjectileClass)
-		{
-			SpawnProjectile(SpawnTransform);
-		}
-
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-	}
 }
 
 void UTDGameplayAbility::SetTarget(AActor* Target)
@@ -65,27 +23,22 @@ AActor* UTDGameplayAbility::GetTarget()
 	return ProjectileTarget;
 }
 
-void UTDGameplayAbility::SpawnProjectile(FTransform SpawnTransform)
-{
-	AProjectileActor* Projectile = GetWorld()->SpawnActorDeferred<AProjectileActor>(ProjectileClass, SpawnTransform, GetOwningActorFromActorInfo(),
-		Cast<APawn>(GetOwningActorFromActorInfo()), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-
-	if (Projectile == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Projectile is Invalid inside %s"), *GetName());
-		return;
-	}
-
-	ApplyGameplayEffectSpecToProj(Projectile);
-
-	Projectile->FinishSpawning(SpawnTransform);
-}
-
-void UTDGameplayAbility::ApplyGameplayEffectSpecToProj(AProjectileActor* Projectile)
+FGameplayEffectSpecHandle UTDGameplayAbility::GetGameplayEffectSpecHandle()
 {
 	//Give Projectile a Gameplay Effect Spec for causing Damage
 	const UTDAbilitySystemComponent* SourceASC = Cast<UTDAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo()));
+	if (IsValid(SourceASC) == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Source Ability System Component is invalid inside %s."), *GetName());
+		return FGameplayEffectSpecHandle();
+	}
+
 	const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+	if (SpecHandle.IsValid() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spec Handle is invalid inside %s."), *GetName());
+		return FGameplayEffectSpecHandle();
+	}
 
 	FTDGameplayTags GameplayTags = FTDGameplayTags::Get();
 	const float ScaledDamage = Damage.GetValueAtLevel(SpecHandle.Data.Get()->GetLevel());
@@ -93,5 +46,5 @@ void UTDGameplayAbility::ApplyGameplayEffectSpecToProj(AProjectileActor* Project
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Basic Turret Damage: %f"), ScaledDamage));
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
 
-	Projectile->DamageEffectSpecHandle = SpecHandle;
+	return SpecHandle;
 }
