@@ -26,29 +26,43 @@ void UTDProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	}
 
 	ITowerInterface* towerInterface = Cast<ITowerInterface>(GetAvatarActorFromActorInfo());
-	if (towerInterface)
+	if (towerInterface == nullptr)
 	{
-		FTransform SpawnTransform = towerInterface->GetProjectileSpawnLocation();
-
-		FRotator newRotation = SpawnTransform.Rotator();
-
-		newRotation.Yaw += 90.0f;
-
-		SpawnTransform.SetRotation(newRotation.Quaternion());
-
-		if (ProjectileClass && DamageEffectClass == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No Damage Effect or Projectile Class have been assigned to %s"), *GetName());
-			return;
-		}
-
-		if (ProjectileClass)
-		{
-			SpawnProjectile(SpawnTransform);
-		}
-
+		UE_LOG(LogTemp, Warning, TEXT("No Tower Interface in the ability: %s"), *GetName());
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
 	}
+
+	FTransform SpawnTransform = towerInterface->GetProjectileSpawnLocation();
+
+	FRotator newRotation = SpawnTransform.Rotator();
+
+	newRotation.Yaw += 90.0f;
+
+	SpawnTransform.SetRotation(newRotation.Quaternion());
+
+	if (ProjectileClass && DamageEffectClass == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Damage Effect or Projectile Class have been assigned to %s"), *GetName());
+		return;
+	}
+
+	if (ProjectileClass)
+	{
+		SpawnProjectile(SpawnTransform);
+	}
+
+	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+}
+
+void UTDProjectileAbility::SetTarget(AActor* Target)
+{
+	ProjectileTarget = Target;
+}
+
+AActor* UTDProjectileAbility::GetTarget()
+{
+	return ProjectileTarget;
 }
 
 void UTDProjectileAbility::SpawnProjectile(FTransform SpawnTransform)

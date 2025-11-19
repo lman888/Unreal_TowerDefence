@@ -13,16 +13,6 @@ UTDGameplayAbility::UTDGameplayAbility()
 
 }
 
-void UTDGameplayAbility::SetTarget(AActor* Target)
-{
-	ProjectileTarget = Target;
-}
-
-AActor* UTDGameplayAbility::GetTarget()
-{
-	return ProjectileTarget;
-}
-
 FGameplayEffectSpecHandle UTDGameplayAbility::GetGameplayEffectSpecHandle()
 {
 	//Give Projectile a Gameplay Effect Spec for causing Damage

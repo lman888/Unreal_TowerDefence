@@ -18,23 +18,15 @@ class TOWERDEFENCE_API UTDGameplayAbility : public UGameplayAbility
 public:
 	UTDGameplayAbility();
 
-	UFUNCTION(BlueprintCallable)
-	void SetTarget(AActor* Target);
-
-	UFUNCTION(BlueprintPure)
-	AActor* GetTarget();
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	FScalableFloat Damage;
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite);
+	float TowerRange;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly);
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
 
 	FGameplayEffectSpecHandle GetGameplayEffectSpecHandle();
-
-private:
-
-	UPROPERTY(EditAnywhere, Category = "Target")
-	TObjectPtr<AActor> ProjectileTarget;
 };

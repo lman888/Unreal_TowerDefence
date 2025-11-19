@@ -14,4 +14,11 @@ class TOWERDEFENCE_API UTDAOEAbility : public UTDGameplayAbility
 {
 	GENERATED_BODY()
 
+public:
+	UTDAOEAbility();
+	~UTDAOEAbility();
+
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+
+private:
 };

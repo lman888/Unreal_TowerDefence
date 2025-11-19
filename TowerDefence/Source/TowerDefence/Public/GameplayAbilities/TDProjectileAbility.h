@@ -21,11 +21,20 @@ public:
 
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
+	UFUNCTION(BlueprintCallable)
+	void SetTarget(AActor* Target);
+
+	UFUNCTION(BlueprintPure)
+	AActor* GetTarget();
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AProjectileActor> ProjectileClass;
 
 private:
 	void SpawnProjectile(FTransform SpawnTransform);
+
+	UPROPERTY(EditAnywhere, Category = "Target")
+	TObjectPtr<AActor> ProjectileTarget;
 
 };

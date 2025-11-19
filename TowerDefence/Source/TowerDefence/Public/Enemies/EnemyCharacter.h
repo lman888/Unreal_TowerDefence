@@ -33,7 +33,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -63,7 +63,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChanged OnMaxHealthChanged;
-	
+
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
@@ -84,16 +84,16 @@ private:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void AddAbility();
-	
+
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(EditAnywhere, Category = "AbilitySystem")
 	TObjectPtr<UTDAttributeSet> AttributeSet;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UNiagaraSystem* DeathEffect;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	USoundBase* DeathSound;
 };
