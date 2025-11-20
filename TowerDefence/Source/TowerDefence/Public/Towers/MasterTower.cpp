@@ -101,6 +101,11 @@ int AMasterTower::GetTowerLevel() const
 	return TowerLevel;
 }
 
+TArray<AActor*> AMasterTower::GetEnemiesInRange()
+{
+	return EnemiesInRadius;
+}
+
 FTransform AMasterTower::GetProjectileSpawnLocation()
 {
 	return ProjectileTransform->GetComponentTransform();

@@ -7,6 +7,7 @@
 #include "Enemies/EnemyCharacter.h"
 #include <AbilitySystemBlueprintLibrary.h>
 #include "AbilitySystem/TDAbilitySystemComponent.h"
+#include <Towers/MasterTower.h>
 
 UTDAOEAbility::UTDAOEAbility()
 {
@@ -36,27 +37,31 @@ void UTDAOEAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 		return;
 	}
 
-	//Find enemies in range.
-	TArray<AActor*> EnemiesInRange;
-	TArray<AActor*> EnemiesInLevel;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyCharacter::StaticClass(), EnemiesInLevel);
-
-	for (AActor* Enemy : EnemiesInLevel)
+	AMasterTower* Owner = Cast<AMasterTower>(GetAvatarActorFromActorInfo());
+	if (Owner == nullptr)
 	{
-		float Distance = FVector::Distance(Enemy->GetActorLocation(), GetOwningActorFromActorInfo()->GetActorLocation());
-
-		if (Distance <= TowerRange)
-		{
-			EnemiesInRange.Add(Enemy);
-		}
+		UE_LOG(LogTemp, Warning, TEXT("The tower that casted this ability [%s] is apparently invalid, not good."), *GetName());
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
 	}
 
-	//Depending on tower level, select a certain amount of enemies.
-	for (size_t i = 0; i < GetAbilityLevel(); i++)
+	if (Owner->GetEnemiesInRange().IsEmpty() == true)
 	{
-		int32 RandomIndex = FMath::RandRange(0, EnemiesInRange.Num() - 1);
+		UE_LOG(LogTemp, Warning, TEXT("The tower has no targets in range when this ability was activated [%s]."), *GetName());
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
 
-		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(EnemiesInRange[RandomIndex]))
+	//Depending on tower level, select a certain amount of enemies and freeze them.
+	//Definetly a better way of doing this, will look at a bit later.
+	for (size_t i = 0; i < Owner->GetEnemiesInRange().Num(); i++)
+	{
+		if (i > GetAbilityLevel())
+		{
+			break;
+		}
+
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Owner->GetEnemiesInRange()[i]))
 		{
 			//Apply the effect to those enemies.
 			TargetASC->ApplyGameplayEffectSpecToSelf(*GetGameplayEffectSpecHandle().Data.Get());

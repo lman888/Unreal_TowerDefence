@@ -66,6 +66,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	int GetTowerLevel() const;
 
+	UFUNCTION(BlueprintPure)
+	TArray<AActor*> GetEnemiesInRange();
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Textures")
