@@ -6,6 +6,7 @@
 #include "AbilitySystem/TDAttributeSet.h"
 #include "AbilitySystem/TDGameplayAbility.h"
 #include "Components/BoxComponent.h"
+#include "Currency/CurrencyComponent.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
@@ -31,6 +32,7 @@ AMasterTower::AMasterTower()
 	BoxComponent->SetupAttachment(TowerBase);
 	ProjectileTransform = CreateDefaultSubobject<UStaticMeshComponent>("Projectile Spawn");
 	ProjectileTransform->SetupAttachment(TowerHead);
+	Currency = CreateDefaultSubobject<UCurrencyComponent>("Currency Component");
 
 	if (AttributeSet == nullptr)
 	{
@@ -142,9 +144,9 @@ void AMasterTower::UpgradeTower_Implementation()
 		TowerLevel++;
 
 		ClientSetTowerHeadMaterial(TowerMaterial);
-		
+
 		AbilitySystemComponent->UpgradeAbility(TowerAbility);
-		
+
 		UpdateTowerUpgradeWidgetInformation();
 	}
 }
