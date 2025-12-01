@@ -7,6 +7,7 @@
 #include "TDPlayerPawn.generated.h"
 
 class UInteractionComponent;
+class UCurrencyComponent;
 
 UCLASS()
 class TOWERDEFENCE_API ATDPlayerPawn : public APawn
@@ -17,17 +18,11 @@ public:
 	// Sets default values for this pawn's properties
 	ATDPlayerPawn();
 
-	UFUNCTION(BlueprintPure, Category = "Currency")
-	int GetCointAmount();
-
-	UFUNCTION(BlueprintCallable)
-	void AddToCointAmount(int AmountToAdd);
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -36,11 +31,13 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "InteractionComponent")
 	TObjectPtr<UInteractionComponent> InteractionComponent;
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Currency")
+	TObjectPtr<UCurrencyComponent> CurrencyComponent;
+
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_SpawnTower(ATowerPlacementPlatform* Platform, TSubclassOf<AMasterTower> Tower);
-	
+
 private:
-	int CoinAmount;
 
 };

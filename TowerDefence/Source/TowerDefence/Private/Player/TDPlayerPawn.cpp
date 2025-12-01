@@ -3,38 +3,28 @@
 #include "Player/TDPlayerPawn.h"
 
 #include "Interaction/InteractionComponent.h"
+#include "Currency/CurrencyComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Platforms/TowerPlacementPlatform.h"
 
 // Sets default values
 ATDPlayerPawn::ATDPlayerPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	bReplicates = true;
-	
-	CoinAmount = 0;
 
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
+	CurrencyComponent = CreateDefaultSubobject<UCurrencyComponent>(TEXT("CurrencyComponent"));
 
-}
-
-int ATDPlayerPawn::GetCointAmount()
-{
-	return CoinAmount;
-}
-
-void ATDPlayerPawn::AddToCointAmount(int AmountToAdd)
-{
-	CoinAmount += AmountToAdd;
 }
 
 // Called when the game starts or when spawned
 void ATDPlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame

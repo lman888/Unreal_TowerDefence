@@ -23,6 +23,11 @@ void UCurrencyComponent::Sell(float SellAmount)
 	GoldAmount = SellAmount / 2;
 }
 
+float UCurrencyComponent::GetCostAmount()
+{
+	return CostAmount;
+}
+
 float UCurrencyComponent::GetGoldAmount()
 {
 	return GoldAmount;

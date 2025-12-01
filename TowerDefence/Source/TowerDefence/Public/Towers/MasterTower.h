@@ -14,7 +14,6 @@ class UGameplayEffect;
 class UBoxComponent;
 class UAbilitySystemComponent;
 class UAttributeSet;
-class UCurrencyComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageChanged, int, NewDamage);
 
@@ -31,6 +30,9 @@ struct FTowerInformation
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int TowerDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float TowerCost;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UTexture2D* TowerImage;
@@ -118,8 +120,6 @@ protected:
 	TObjectPtr<UStaticMeshComponent> TowerBody;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Mesh")
 	TObjectPtr<UStaticMeshComponent> TowerHead;
-	UPROPERTY(EditAnywhere, Category = "Currency")
-	TObjectPtr<UCurrencyComponent> Currency;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Mesh")
 	TObjectPtr<UStaticMeshComponent> ProjectileTransform;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Targeting")

@@ -23,9 +23,15 @@ public:
 	void Sell(float SellAmount);
 
 	UFUNCTION(BlueprintPure)
+	float GetCostAmount();
+
+	UFUNCTION(BlueprintPure)
 	float GetGoldAmount();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float GoldAmount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CostAmount;
 };
